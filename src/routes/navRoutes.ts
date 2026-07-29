@@ -22,6 +22,18 @@ export const navRoutes: NavItem[] = [
     path: "/BusinessValue",
   },
   {
+    name: "Domain & Hosting",
+    path: "/domain-hosting",
+  },
+  {
+    name: "Web Development",
+    path: "/web-development",
+  },
+  {
+    name: "About Us",
+    path: "/about-us",
+  },
+  {
     name: "Shop",
     children: [
       { name: "All Products", path: "/shop" },

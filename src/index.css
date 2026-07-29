@@ -1,6 +1,52 @@
 @import "tailwindcss";
-/* @tailwind base;
-@tailwind components; */
-@tailwind utilities;
+
+/* ================================================================
+   Tailwind v4 — Dark / Light mode via .dark class on <html>
+   ================================================================ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ================================================================
+   Light-mode overrides — semantic color tokens
+   ================================================================ */
+.light {
+    --color-bg: #f8f9fc;
+    --color-surface: #ffffff;
+    --color-surface-alt: #f1f3f8;
+    --color-border: rgba(0, 0, 0, 0.08);
+    --color-text-primary: #1a1f36;
+    --color-text-secondary: #596887;
+    --color-text-muted: #8b95ad;
+    --color-accent: #1E56E0;
+    --color-accent-light: #45CFFF;
+}
+
+.dark {
+    --color-bg: #060B14;
+    --color-surface: #0F1E3D;
+    --color-surface-alt: #0B1730;
+    --color-border: rgba(255, 255, 255, 0.06);
+    --color-text-primary: #ffffff;
+    --color-text-secondary: #B9C7E0;
+    --color-text-muted: #7C8AAD;
+    --color-accent: #45CFFF;
+    --color-accent-light: #1E56E0;
+}
+
+/* ================================================================
+   Global theme-aware utility classes
+   Applied automatically based on .dark / .light on <html>
+   ================================================================ */
+@layer utilities {
+    .theme-bg { @apply bg-white dark:bg-[#060B14]; }
+    .theme-bg-alt { @apply bg-[#f1f3f8] dark:bg-[#081020]; }
+    .theme-surface { @apply bg-white dark:bg-[#0F1E3D]; }
+    .theme-surface-alt { @apply bg-[#f1f3f8] dark:bg-[#0B1730]; }
+    .theme-text { @apply text-[#1a1f36] dark:text-white; }
+    .theme-text-secondary { @apply text-[#596887] dark:text-[#B9C7E0]; }
+    .theme-text-muted { @apply text-[#8b95ad] dark:text-[#7C8AAD]; }
+    .theme-border { @apply border-black/8 dark:border-white/[0.06]; }
+    .theme-border-accent { @apply border-black/10 dark:border-white/[0.09]; }
+}
+
 
 

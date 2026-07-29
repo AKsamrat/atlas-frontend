@@ -1,87 +1,312 @@
-import React from 'react'
+import {
+    Mail,
+    Phone,
+    MapPin,
+    ArrowRight,
+    Send,
+    Globe,
+    Code,
+    Palette,
+    Megaphone,
+} from "lucide-react";
+import { FaFacebook, FaInstagram, FaTwitter, FaLinkedin } from "react-icons/fa";
+import logo from "../../assets/footerlogo.png";
+import { useContent } from "../../context/ContentContext";
 
-const Footer = () => {
+/* ------------------------------------------------------------------ */
+/*  Entra Global Tech — Premium Footer                                */
+/*  React + TypeScript + Tailwind  (navy / cyan / blue tokens)         */
+/* ------------------------------------------------------------------ */
+
+const SERVICES = [
+    { label: "Domain & Hosting", href: "/domain-hosting", icon: Globe },
+    { label: "Web Development", href: "/web-development", icon: Code },
+    { label: "Graphic Design", href: "/#design", icon: Palette },
+    { label: "Digital Marketing", href: "/#marketing", icon: Megaphone },
+];
+
+const COMPANY = [
+    { label: "About Us", href: "/about-us" },
+    { label: "Our Brand", href: "/OurBrand" },
+    { label: "Business Value", href: "/BusinessValue" },
+    { label: "Blog", href: "/blog" },
+
+];
+
+const SUPPORT = [
+    { label: "Help Center", href: "/help-center" },
+    { label: "Contact Us", href: "/contact" },
+    { label: "Privacy Policy", href: "/privacy-policy" },
+    { label: "Terms of Service", href: "/terms-of-service" },
+];
+
+
+
+export default function Footer() {
+    const { content } = useContent();
+    const c = content.contact;
+    const CONTACT_INFO = [
+        { label: c.phone, href: `tel:${c.phone}`, icon: Phone },
+        { label: c.email, href: `mailto:${c.email}`, icon: Mail },
+        { label: c.address, href: null, icon: MapPin },
+    ];
+    const SOCIALS = [
+        { label: "Facebook", href: c.socialFacebook || "#", icon: FaFacebook },
+        { label: "Instagram", href: c.socialInstagram || "#", icon: FaInstagram },
+        { label: "Twitter", href: c.socialTwitter || "#", icon: FaTwitter },
+        { label: "LinkedIn", href: c.socialLinkedin || "#", icon: FaLinkedin },
+    ];
+
     return (
-        <footer className="px-4 divide-y dark:bg-gray-100 dark:text-gray-800">
-            <div className="max-w-7xl flex flex-col justify-between py-10 mx-auto space-y-8 lg:flex-row lg:space-y-0">
-                <div className="lg:w-1/3">
-                    <a rel="noopener noreferrer" href="#" className="flex justify-center space-x-3 lg:justify-start">
-                        <div className="flex items-center justify-center w-12 h-12 rounded-full dark:bg-violet-600">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor" className="flex-shrink-0 w-5 h-5 rounded-full dark:text-gray-50">
-                                <path d="M18.266 26.068l7.839-7.854 4.469 4.479c1.859 1.859 1.859 4.875 0 6.734l-1.104 1.104c-1.859 1.865-4.875 1.865-6.734 0zM30.563 2.531l-1.109-1.104c-1.859-1.859-4.875-1.859-6.734 0l-6.719 6.734-6.734-6.734c-1.859-1.859-4.875-1.859-6.734 0l-1.104 1.104c-1.859 1.859-1.859 4.875 0 6.734l6.734 6.734-6.734 6.734c-1.859 1.859-1.859 4.875 0 6.734l1.104 1.104c1.859 1.859 4.875 1.859 6.734 0l21.307-21.307c1.859-1.859 1.859-4.875 0-6.734z"></path>
-                            </svg>
+        <footer className="relative overflow-hidden bg-[#f1f3f8] dark:bg-[#040911]">
+            {/* ============================================================ */}
+            {/*  Layered ambient glows                                       */}
+            {/* ============================================================ */}
+            <div
+                className="pointer-events-none absolute inset-0"
+                style={{
+                    background: [
+                        "radial-gradient(1000px 500px at 20% 0%, rgba(46,139,240,0.08), transparent 55%)",
+                        "radial-gradient(700px 350px at 80% 10%, rgba(69,207,255,0.06), transparent 50%)",
+                        "radial-gradient(500px 300px at 50% 100%, rgba(30,86,224,0.05), transparent 55%)",
+                    ].join(", "),
+                }}
+            />
+
+            {/* subtle dot grid */}
+            <div
+                className="pointer-events-none absolute inset-0 opacity-[0.025]"
+                style={{
+                    backgroundImage:
+                        "radial-gradient(circle, #45CFFF 0.8px, transparent 0.8px)",
+                    backgroundSize: "28px 28px",
+                }}
+            />
+
+            <div className="relative z-10">
+                {/* ========================================================== */}
+                {/*  CTA BANNER                                                */}
+                {/* ========================================================== */}
+                <div className="border-b border-black/6 dark:border-white/[0.05]">
+                    <div className="mx-auto flex max-w-7xl flex-col items-center gap-6 py-12 text-center md:flex-row md:justify-between md:text-left">
+                        <div>
+                            <h3 className="font-sora text-[1.45rem] font-bold leading-snug text-[#1a1f36] sm:text-[1.7rem] dark:text-white">
+                                Ready to grow your brand{" "}
+                                <span className="bg-gradient-to-r from-[#45CFFF] to-[#1E56E0] bg-clip-text text-transparent">
+                                    with Entra?
+                                </span>
+                            </h3>
+                            <p className="mt-2 max-w-lg text-[0.88rem] leading-relaxed text-[#8b95ad] dark:text-[#7C8AAD]">
+                                From hosting to marketing — we build the digital infrastructure your
+                                business needs to scale.
+                            </p>
                         </div>
-                        <span className="self-center text-2xl font-semibold">Brand name</span>
-                    </a>
+                        <a
+                            href="/contact"
+                            className="group inline-flex shrink-0 items-center gap-2.5 rounded-full bg-gradient-to-r from-[#45CFFF] to-[#1E56E0] px-7 py-3.5 font-sora text-[0.88rem] font-semibold text-[#060B14] shadow-[0_8px_30px_rgba(46,139,240,0.25)] transition-all duration-300 hover:shadow-[0_12px_40px_rgba(46,139,240,0.35)]"
+                        >
+                            <Send
+                                size={15}
+                                className="transition-transform duration-300 group-hover:translate-x-0.5"
+                            />
+                            Get a Free Quote
+                            <ArrowRight
+                                size={15}
+                                className="transition-transform duration-300 group-hover:translate-x-1"
+                            />
+                        </a>
+                    </div>
                 </div>
-                <div className="grid grid-cols-2 text-sm gap-x-3 gap-y-8 lg:w-2/3 sm:grid-cols-4">
-                    <div className="space-y-3">
-                        <h3 className="tracking-wide uppercase dark:text-gray-900">Product</h3>
-                        <ul className="space-y-1">
-                            <li>
-                                <a rel="noopener noreferrer" href="#">Features</a>
-                            </li>
-                            <li>
-                                <a rel="noopener noreferrer" href="#">Integrations</a>
-                            </li>
-                            <li>
-                                <a rel="noopener noreferrer" href="#">Pricing</a>
-                            </li>
-                            <li>
-                                <a rel="noopener noreferrer" href="#">FAQ</a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div className="space-y-3">
-                        <h3 className="tracking-wide uppercase dark:text-gray-900">Company</h3>
-                        <ul className="space-y-1">
-                            <li>
-                                <a rel="noopener noreferrer" href="#">Privacy</a>
-                            </li>
-                            <li>
-                                <a rel="noopener noreferrer" href="#">Terms of Service</a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div className="space-y-3">
-                        <h3 className="uppercase dark:text-gray-900">Developers</h3>
-                        <ul className="space-y-1">
-                            <li>
-                                <a rel="noopener noreferrer" href="#">Public API</a>
-                            </li>
-                            <li>
-                                <a rel="noopener noreferrer" href="#">Documentation</a>
-                            </li>
-                            <li>
-                                <a rel="noopener noreferrer" href="#">Guides</a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div className="space-y-3">
-                        <div className="uppercase dark:text-gray-900">Social media</div>
-                        <div className="flex justify-start space-x-3">
-                            <a rel="noopener noreferrer" href="#" title="Facebook" className="flex items-center p-1">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 32 32" className="w-5 h-5 fill-current">
-                                    <path d="M32 16c0-8.839-7.167-16-16-16-8.839 0-16 7.161-16 16 0 7.984 5.849 14.604 13.5 15.803v-11.177h-4.063v-4.625h4.063v-3.527c0-4.009 2.385-6.223 6.041-6.223 1.751 0 3.584 0.312 3.584 0.312v3.937h-2.021c-1.984 0-2.604 1.235-2.604 2.5v3h4.437l-0.713 4.625h-3.724v11.177c7.645-1.199 13.5-7.819 13.5-15.803z"></path>
-                                </svg>
+
+                {/* ========================================================== */}
+                {/*  MAIN CONTENT                                              */}
+                {/* ========================================================== */}
+                <div className="mx-auto max-w-7xl">
+                    <div className="grid gap-10 py-14 lg:grid-cols-12 lg:gap-10">
+                        {/* ================================================== */}
+                        {/*  Brand column — logo, description, newsletter, social */}
+                        {/* ================================================== */}
+                        <div className="lg:col-span-4 lg:pr-4">
+                            <a href="/" className="inline-flex items-center gap-3">
+                                <div className="flex items-center gap-2.5 rounded-xl bg-white px-2 py-1 dark:bg-white">
+                                    <img
+                                        src={logo}
+                                        alt="Entra Global Tech"
+                                        className="h-28 w-auto transition-transform duration-300 hover:scale-105"
+                                    />
+                                </div>
                             </a>
-                            <a rel="noopener noreferrer" href="#" title="Twitter" className="flex items-center p-1">
-                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 fill-current">
-                                    <path d="M23.954 4.569a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.691 8.094 4.066 6.13 1.64 3.161a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.061a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.937 4.937 0 004.604 3.417 9.868 9.868 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.054 0 13.999-7.496 13.999-13.986 0-.209 0-.42-.015-.63a9.936 9.936 0 002.46-2.548l-.047-.02z"></path>
-                                </svg>
+
+                            <p className="mt-5 max-w-[36ch] text-[0.88rem] leading-[1.7] text-[#8b95ad] dark:text-[#7C8AAD]">
+                                One team for hosting, web development, graphic design and digital
+                                marketing — all connected under one hub.
+                            </p>
+
+                            {/* newsletter card */}
+                            <div className="mt-7 rounded-2xl border border-black/6 bg-white p-5 backdrop-blur-sm dark:border-white/[0.06] dark:bg-white/[0.02]">
+                                {/* <p className="mb-1 font-sora text-[0.82rem] font-semibold text-[#1a1f36] dark:text-white">
+                                    Subscribe to our newsletter
+                                </p>
+                                <p className="mb-4 text-[0.76rem] text-[#8b95ad] dark:text-[#596887]">
+                                    Tips, updates & offers — straight to your inbox.
+                                </p> */}
+                                <form
+                                    onSubmit={(e) => e.preventDefault()}
+                                    className="flex overflow-hidden rounded-xl border border-black/8 bg-[#f1f3f8] transition-all duration-300 focus-within:border-[#45CFFF]/40 focus-within:shadow-[0_0_20px_rgba(46,139,240,0.08)] dark:border-white/[0.08] dark:bg-[#060B14]/80"
+                                >
+                                    <input
+                                        type="email"
+                                        placeholder="you@company.com"
+                                        className="w-full bg-transparent px-4 py-2.5 text-[0.82rem] text-[#1a1f36] placeholder:text-[#8b95ad] outline-none dark:text-white dark:placeholder:text-[#3d4f6e]"
+                                    />
+                                    <button
+                                        type="submit"
+                                        className="flex shrink-0 items-center gap-1.5 bg-gradient-to-r from-[#45CFFF] to-[#1E56E0] px-4 font-sora text-[0.78rem] font-semibold text-[#060B14] transition-all hover:opacity-90"
+                                    >
+                                        <Send size={12} />
+                                        Subscribe
+                                    </button>
+                                </form>
+                            </div>
+
+
+                        </div>
+
+                        {/* ================================================== */}
+                        {/*  Link columns                                        */}
+                        {/* ================================================== */}
+                        <div className="lg:col-span-8 grid grid-cols-2 gap-8 sm:grid-cols-4">
+                            {/* Services — with icon badges */}
+                            <div>
+                                <h4 className="mb-5 font-sora text-[1.1rem] font-bold uppercase tracking-[0.16em] text-[#1a1f36] dark:text-white">
+                                    Services
+                                </h4>
+                                <ul className="space-y-3">
+                                    {SERVICES.map((link) => (
+                                        <li key={link.label}>
+                                            <a
+                                                href={link.href}
+                                                className="group/link flex items-center gap-2 text-[1rem] text-[#8b95ad] transition-colors duration-200 hover:text-[#45CFFF] dark:text-[#7C8AAD]"
+                                            >
+                                                <span className="flex h-6 w-6 items-center justify-center rounded-md bg-[#45CFFF]/[0.07] text-[#45CFFF]/60 transition-all duration-200 group-hover/link:bg-[#45CFFF]/15 group-hover/link:text-[#45CFFF]">
+                                                    <link.icon size={12} />
+                                                </span>
+                                                {link.label}
+                                            </a>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            {/* Company */}
+                            <div>
+                                <h4 className="mb-5 font-sora text-[1.1rem] font-bold uppercase tracking-[0.16em] text-[#1a1f36] dark:text-white">
+                                    Company
+                                </h4>
+                                <ul className="space-y-3">
+                                    {COMPANY.map((link) => (
+                                        <li key={link.label}>
+                                            <a
+                                                href={link.href}
+                                                className="relative inline-block text-[1rem] text-[#8b95ad] transition-colors duration-200 hover:text-[#45CFFF] after:absolute after:bottom-[-2px] after:left-0 after:h-px after:w-0 after:bg-[#45CFFF]/50 after:transition-all after:duration-300 hover:after:w-full dark:text-[#7C8AAD]"
+                                            >
+                                                {link.label}
+                                            </a>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            {/* Support */}
+                            <div>
+                                <h4 className="mb-5 font-sora text-[1.1rem] font-bold uppercase tracking-[0.16em] text-[#1a1f36] dark:text-white">
+                                    Support
+                                </h4>
+                                <ul className="space-y-3">
+                                    {SUPPORT.map((link) => (
+                                        <li key={link.label}>
+                                            <a
+                                                href={link.href}
+                                                className="relative inline-block text-[1rem] text-[#8b95ad] transition-colors duration-200 hover:text-[#45CFFF] after:absolute after:bottom-[-2px] after:left-0 after:h-px after:w-0 after:bg-[#45CFFF]/50 after:transition-all after:duration-300 hover:after:w-full dark:text-[#7C8AAD]"
+                                            >
+                                                {link.label}
+                                            </a>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            {/* Contact */}
+                            <div>
+                                <h4 className="mb-5 font-sora text-[1.1rem] font-bold uppercase tracking-[0.16em] text-[#1a1f36] dark:text-white">
+                                    Get in Touch
+                                </h4>
+                                <ul className="space-y-3.5">
+                                    {CONTACT_INFO.map(({ label, href, icon: Icon }) => {
+                                        const inner = (
+                                            <span className="flex items-start gap-2.5 text-[1rem] text-[#8b95ad] transition-colors duration-200 hover:text-[#1a1f36] dark:text-[#7C8AAD] dark:hover:text-white">
+                                                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-[#45CFFF]/[0.07] text-[#45CFFF]/70">
+                                                    <Icon size={13} />
+                                                </span>
+                                                <span>{label}</span>
+                                            </span>
+                                        );
+                                        return (
+                                            <li key={label}>
+                                                {href ? (
+                                                    <a href={href}>{inner}</a>
+                                                ) : (
+                                                    inner
+                                                )}
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                                {/* social icons */}
+                                <div className="mt-6 flex items-center gap-2.5">
+                                    {SOCIALS.map(({ label, href, icon: Icon }) => (
+                                        <a
+                                            key={label}
+                                            href={href}
+                                            aria-label={label}
+                                            className="group/social flex h-10 w-10 items-center justify-center rounded-xl border border-black/8 bg-white text-[#8b95ad] transition-all duration-300 hover:border-[#45CFFF]/30 hover:bg-[#45CFFF]/10 hover:text-[#45CFFF] hover:shadow-[0_4px_16px_rgba(46,139,240,0.12)] dark:border-white/[0.07] dark:bg-white/[0.02] dark:text-[#596887]"
+                                        >
+                                            <Icon
+                                                size={16}
+                                                className="transition-transform duration-300 group-hover/social:scale-110"
+                                            />
+                                        </a>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* ========================================================== */}
+                {/*  BOTTOM BAR                                                */}
+                {/* ========================================================== */}
+                <div className="border-t border-black/6 dark:border-white/[0.05]">
+                    <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 py-6 sm:flex-row">
+                        <p className="text-[0.76rem] text-[#8b95ad] dark:text-[#3d4f6e]">
+                            © {new Date().getFullYear()} Entra Global Tech. All rights reserved.
+                        </p>
+                        <div className="flex items-center gap-6 text-[0.76rem] text-[#8b95ad] dark:text-[#3d4f6e]">
+                            <a href="/privacy-policy" className="transition-colors duration-200 hover:text-[#45CFFF]">
+                                Privacy Policy
                             </a>
-                            <a rel="noopener noreferrer" href="#" title="Instagram" className="flex items-center p-1">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor" className="w-5 h-5 fill-current">
-                                    <path d="M16 0c-4.349 0-4.891 0.021-6.593 0.093-1.709 0.084-2.865 0.349-3.885 0.745-1.052 0.412-1.948 0.959-2.833 1.849-0.891 0.885-1.443 1.781-1.849 2.833-0.396 1.020-0.661 2.176-0.745 3.885-0.077 1.703-0.093 2.244-0.093 6.593s0.021 4.891 0.093 6.593c0.084 1.704 0.349 2.865 0.745 3.885 0.412 1.052 0.959 1.948 1.849 2.833 0.885 0.891 1.781 1.443 2.833 1.849 1.020 0.391 2.181 0.661 3.885 0.745 1.703 0.077 2.244 0.093 6.593 0.093s4.891-0.021 6.593-0.093c1.704-0.084 2.865-0.355 3.885-0.745 1.052-0.412 1.948-0.959 2.833-1.849 0.891-0.885 1.443-1.776 1.849-2.833 0.391-1.020 0.661-2.181 0.745-3.885 0.077-1.703 0.093-2.244 0.093-6.593s-0.021-4.891-0.093-6.593c-0.084-1.704-0.355-2.871-0.745-3.885-0.412-1.052-0.959-1.948-1.849-2.833-0.885-0.891-1.776-1.443-2.833-1.849-1.020-0.396-2.181-0.661-3.885-0.745-1.703-0.077-2.244-0.093-6.593-0.093zM16 2.88c4.271 0 4.781 0.021 6.469 0.093 1.557 0.073 2.405 0.333 2.968 0.553 0.751 0.291 1.276 0.635 1.844 1.197 0.557 0.557 0.901 1.088 1.192 1.839 0.22 0.563 0.48 1.411 0.553 2.968 0.072 1.688 0.093 2.199 0.093 6.469s-0.021 4.781-0.099 6.469c-0.084 1.557-0.344 2.405-0.563 2.968-0.303 0.751-0.641 1.276-1.199 1.844-0.563 0.557-1.099 0.901-1.844 1.192-0.556 0.22-1.416 0.48-2.979 0.553-1.697 0.072-2.197 0.093-6.479 0.093s-4.781-0.021-6.48-0.099c-1.557-0.084-2.416-0.344-2.979-0.563-0.76-0.303-1.281-0.641-1.839-1.199-0.563-0.563-0.921-1.099-1.197-1.844-0.224-0.556-0.48-1.416-0.563-2.979-0.057-1.677-0.084-2.197-0.084-6.459 0-4.26 0.027-4.781 0.084-6.479 0.083-1.563 0.339-2.421 0.563-2.979 0.276-0.761 0.635-1.281 1.197-1.844 0.557-0.557 1.079-0.917 1.839-1.199 0.563-0.219 1.401-0.479 2.964-0.557 1.697-0.061 2.197-0.083 6.473-0.083zM16 7.787c-4.541 0-8.213 3.677-8.213 8.213 0 4.541 3.677 8.213 8.213 8.213 4.541 0 8.213-3.677 8.213-8.213 0-4.541-3.677-8.213-8.213-8.213zM16 21.333c-2.948 0-5.333-2.385-5.333-5.333s2.385-5.333 5.333-5.333c2.948 0 5.333 2.385 5.333 5.333s-2.385 5.333-5.333 5.333zM26.464 7.459c0 1.063-0.865 1.921-1.923 1.921-1.063 0-1.921-0.859-1.921-1.921 0-1.057 0.864-1.917 1.921-1.917s1.923 0.86 1.923 1.917z"></path>
-                                </svg>
+                            <span className="h-3 w-px bg-black/6 dark:bg-white/[0.06]" />
+                            <a href="/terms-of-service" className="transition-colors duration-200 hover:text-[#45CFFF]">
+                                Terms of Service
+                            </a>
+                            <span className="h-3 w-px bg-black/6 dark:bg-white/[0.06]" />
+                            <a href="/help-center" className="transition-colors duration-200 hover:text-[#45CFFF]">
+                                Help Center
                             </a>
                         </div>
                     </div>
                 </div>
             </div>
-            <div className="py-6 text-sm text-center dark:text-gray-600">© 2026 Company Co. All rights reserved.</div>
         </footer>
-    )
+    );
 }
-
-export default Footer
