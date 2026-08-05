@@ -2,7 +2,7 @@ import { ArrowRight, CheckCircle, Target, Image, Video, Zap, ShoppingCart } from
 import { FaInstagram } from "react-icons/fa";
 import FinalCTA from "../components/home/FinalCTA";
 import { useContent } from "../context/ContentContext";
-import { useCart } from "../store/cartStore";
+import { useCart } from "../store/useCart";
 
 export default function InstagramMarketing() {
     const { content } = useContent();

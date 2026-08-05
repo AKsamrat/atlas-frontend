@@ -48,9 +48,17 @@ const DashboardLayout = () => {
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <span className="text-sm text-[#596887] dark:text-[#B9C7E0]">Welcome, {userName}</span>
-                                    <div className="w-9 h-9 bg-gradient-to-br from-[#45CFFF] to-[#1E56E0] rounded-full flex items-center justify-center">
-                                        <span className="text-white text-sm font-bold">{userName[0]?.toUpperCase() || "A"}</span>
-                                    </div>
+                                    {user?.avatar ? (
+                                        <img
+                                            src={user.avatar.startsWith("http") ? user.avatar : `${import.meta.env.VITE_API_URL?.replace("/api", "")}/storage/${user.avatar}`}
+                                            alt={userName}
+                                            className="w-9 h-9 rounded-full object-cover border-2 border-[#45CFFF]/30 shadow-[0_2px_8px_rgba(69,207,255,0.15)]"
+                                        />
+                                    ) : (
+                                        <div className="w-9 h-9 bg-gradient-to-br from-[#45CFFF] to-[#1E56E0] rounded-full flex items-center justify-center">
+                                            <span className="text-white text-sm font-bold">{userName[0]?.toUpperCase() || "A"}</span>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>

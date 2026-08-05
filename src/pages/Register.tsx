@@ -24,8 +24,8 @@ export default function Register() {
             setError("Please fill in all fields");
             return;
         }
-        if (password.length < 6) {
-            setError("Password must be at least 6 characters");
+        if (password.length < 8) {
+            setError("Password must be at least 8 characters");
             return;
         }
         if (password !== confirmPassword) {
@@ -34,13 +34,14 @@ export default function Register() {
         }
 
         setLoading(true);
-        const newUser = await register(name, email, password);
+        const result = await register(name, email, password);
         setLoading(false);
 
-        if (newUser) {
-            navigate("/user");
+        if (result.user) {
+            // New registrations default to 'customer' role
+            navigate(result.user.role === "customer" ? "/customer" : "/user");
         } else {
-            setError("An account with this email already exists");
+            setError(result.error || "Registration failed. Please try again.");
         }
     };
 

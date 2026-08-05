@@ -28,7 +28,9 @@ export default function Login() {
         setLoading(false);
 
         if (loggedInUser) {
-            navigate(loggedInUser.role === "admin" ? "/dashboard" : "/user");
+            if (loggedInUser.role === "admin") navigate("/dashboard");
+            else if (loggedInUser.role === "customer") navigate("/customer");
+            else navigate("/user");
         } else {
             setError("Invalid email or password");
         }

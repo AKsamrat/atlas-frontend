@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
     Mail,
     Phone,
@@ -9,9 +10,12 @@ import {
     Palette,
     Megaphone,
 } from "lucide-react";
+import { useState } from "react";
 import { FaFacebook, FaInstagram, FaTwitter, FaLinkedin } from "react-icons/fa";
 import logo from "../../assets/footerlogo.png";
 import { useContent } from "../../context/ContentContext";
+import { subscribersApi } from "../../services";
+import Swal from "sweetalert2";
 
 /* ------------------------------------------------------------------ */
 /*  Entra Global Tech — Premium Footer                                */
@@ -45,6 +49,41 @@ const SUPPORT = [
 export default function Footer() {
     const { content } = useContent();
     const c = content.contact;
+    const [subscribeEmail, setSubscribeEmail] = useState("");
+    const [subscribing, setSubscribing] = useState(false);
+
+    const handleSubscribe = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!subscribeEmail.trim()) return;
+        setSubscribing(true);
+        try {
+            const res = await subscribersApi.subscribe(subscribeEmail.trim());
+            Swal.fire({
+                icon: "success",
+                title: "Subscribed!",
+                text: res.data.message,
+                timer: 2500,
+                showConfirmButton: false,
+                background: "#0d1829",
+                color: "#fff",
+            });
+            setSubscribeEmail("");
+        } catch (err: any) {
+            const msg = err.response?.data?.message || "Something went wrong. Please try again.";
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: msg,
+                timer: 3000,
+                showConfirmButton: false,
+                background: "#0d1829",
+                color: "#fff",
+            });
+        } finally {
+            setSubscribing(false);
+        }
+    };
+
     const CONTACT_INFO = [
         { label: c.phone, href: `tel:${c.phone}`, icon: Phone },
         { label: c.email, href: `mailto:${c.email}`, icon: Mail },
@@ -151,20 +190,28 @@ export default function Footer() {
                                     Tips, updates & offers — straight to your inbox.
                                 </p> */}
                                 <form
-                                    onSubmit={(e) => e.preventDefault()}
+                                    onSubmit={handleSubscribe}
                                     className="flex overflow-hidden rounded-xl border border-black/8 bg-[#f1f3f8] transition-all duration-300 focus-within:border-[#45CFFF]/40 focus-within:shadow-[0_0_20px_rgba(46,139,240,0.08)] dark:border-white/[0.08] dark:bg-[#060B14]/80"
                                 >
                                     <input
                                         type="email"
+                                        value={subscribeEmail}
+                                        onChange={(e) => setSubscribeEmail(e.target.value)}
                                         placeholder="you@company.com"
+                                        required
                                         className="w-full bg-transparent px-4 py-2.5 text-[0.82rem] text-[#1a1f36] placeholder:text-[#8b95ad] outline-none dark:text-white dark:placeholder:text-[#3d4f6e]"
                                     />
                                     <button
                                         type="submit"
-                                        className="flex shrink-0 items-center gap-1.5 bg-gradient-to-r from-[#45CFFF] to-[#1E56E0] px-4 font-sora text-[0.78rem] font-semibold text-[#060B14] transition-all hover:opacity-90"
+                                        disabled={subscribing}
+                                        className="flex shrink-0 items-center gap-1.5 bg-gradient-to-r from-[#45CFFF] to-[#1E56E0] px-4 font-sora text-[0.78rem] font-semibold text-[#060B14] transition-all hover:opacity-90 disabled:opacity-60"
                                     >
-                                        <Send size={12} />
-                                        Subscribe
+                                        {subscribing ? (
+                                            <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-[#060B14] border-t-transparent" />
+                                        ) : (
+                                            <Send size={12} />
+                                        )}
+                                        {subscribing ? "..." : "Subscribe"}
                                     </button>
                                 </form>
                             </div>

@@ -1,20 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
-    FaHome,
-    FaTachometerAlt,
-    FaShoppingCart,
-    FaBars,
-    FaChevronRight,
-    FaUserTie,
-    FaCog,
-    FaWallet,
-    FaSignOutAlt,
-    FaGlobe,
-    FaTimes,
-} from "react-icons/fa";
+    LayoutDashboard,
+    ShoppingCart,
+    Menu,
+    ChevronRight,
+    UserCog,
+    Settings,
+    Wallet,
+    LogOut,
+    Globe,
+    X,
+    Home,
+} from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import entraLogo from "../../assets/entra-logo.png";
 
 /* ------------------------------------------------------------------ */
 /*  Sidebar navigation data                                           */
@@ -23,22 +24,23 @@ const sidebarRoutes = [
     {
         name: "Dashboard",
         path: "/dashboard",
-        icon: FaTachometerAlt,
+        icon: LayoutDashboard,
     },
     {
         name: "HR Management",
-        icon: FaUserTie,
+        icon: UserCog,
         children: [
             { name: "Employees", path: "/dashboard/employees" },
             { name: "Attendance", path: "/dashboard/attendance" },
             { name: "Leave Management", path: "/dashboard/leave" },
+            { name: "Daily Submissions", path: "/dashboard/daily-submissions" },
             { name: "Departments", path: "/dashboard/departments" },
             { name: "Payroll", path: "/dashboard/payroll" },
         ],
     },
     {
         name: "E-Commerce",
-        icon: FaShoppingCart,
+        icon: ShoppingCart,
         children: [
             { name: "Products", path: "/dashboard/products" },
             { name: "Orders", path: "/dashboard/orders" },
@@ -48,7 +50,7 @@ const sidebarRoutes = [
     },
     {
         name: "Accounting",
-        icon: FaWallet,
+        icon: Wallet,
         children: [
             { name: "Accounts", path: "/dashboard/accounts" },
             { name: "Expenses", path: "/dashboard/expenses" },
@@ -57,7 +59,7 @@ const sidebarRoutes = [
     },
     {
         name: "Website Content",
-        icon: FaGlobe,
+        icon: Globe,
         children: [
             { name: "Services", path: "/dashboard/content/services" },
             { name: "Partners", path: "/dashboard/content/partners" },
@@ -65,13 +67,14 @@ const sidebarRoutes = [
             { name: "Contact & Branding", path: "/dashboard/content/contact" },
             { name: "Domain Packages", path: "/dashboard/content/domain-packages" },
             { name: "Service Packages", path: "/dashboard/content/service-packages" },
+            { name: "Subscribers", path: "/dashboard/subscribers" },
         ],
     },
 ];
 
 const bottomRoutes = [
-    { name: "Home", path: "/", icon: FaHome },
-    { name: "Settings", path: "/dashboard/settings", icon: FaCog },
+    { name: "Home", path: "/", icon: Home },
+    { name: "Settings", path: "/dashboard/settings", icon: Settings },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -84,19 +87,24 @@ const Sidebar = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { user, logout } = useAuth();
+    const [, startTransition] = useTransition();
 
     // Auto-close mobile sidebar on route change
     useEffect(() => {
-        setIsOpen(false);
-    }, [location.pathname]);
+        startTransition(() => {
+            setIsOpen(false);
+        });
+    }, [location.pathname, startTransition]);
 
     // Auto-expand active parent on route change
     useEffect(() => {
         const active = sidebarRoutes.find((r) =>
             r.children?.some((c) => location.pathname.startsWith(c.path))
         );
-        if (active) setOpenMenu(active.name);
-    }, [location.pathname]);
+        startTransition(() => {
+            setOpenMenu(active?.name ?? null);
+        });
+    }, [location.pathname, startTransition]);
 
     const handleLogout = () => {
         logout();
@@ -117,8 +125,8 @@ const Sidebar = () => {
             {/* ── Mobile Top Bar ──────────────────────────────────── */}
             <div className="md:hidden flex items-center justify-between px-4 py-3 bg-[#060B14] text-white border-b border-white/[0.06]">
                 <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#45CFFF] to-[#1E56E0] flex items-center justify-center">
-                        <span className="text-xs font-bold text-[#060B14]">A</span>
+                    <div className="flex items-center justify-center rounded-lg bg-white p-1">
+                        <img src={entraLogo} alt="Entra" className="h-7 w-auto" />
                     </div>
                     <span className="font-sora text-sm font-semibold tracking-tight">Admin Panel</span>
                 </div>
@@ -126,7 +134,7 @@ const Sidebar = () => {
                     onClick={() => setIsOpen(!isOpen)}
                     className="rounded-lg p-2 text-[#B9C7E0] hover:bg-white/[0.06] transition-colors"
                 >
-                    {isOpen ? <FaTimes size={18} /> : <FaBars size={18} />}
+                    {isOpen ? <X size={18} /> : <Menu size={18} />}
                 </button>
             </div>
 
@@ -140,22 +148,26 @@ const Sidebar = () => {
             >
                 {/* ── Brand Header ──────────────────────────────── */}
                 <div className={`flex items-center gap-3 border-b border-white/[0.06] px-4 py-4 shrink-0 ${collapsed ? "justify-center px-0" : ""}`}>
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#45CFFF] to-[#1E56E0] shadow-[0_4px_16px_rgba(46,139,240,0.3)]">
-                        <span className="text-sm font-bold text-[#060B14] font-sora">A</span>
+                    <div className="flex shrink-0 items-center justify-center rounded-xl bg-white p-1.5 shadow-sm">
+                        <img
+                            src={entraLogo}
+                            alt="Entra Global Tech"
+                            className={`${collapsed ? "h-7 w-7 object-contain" : "h-8 w-auto"}`}
+                        />
                     </div>
-                    {!collapsed && (
+                    {/* {!collapsed && (
                         <div className="min-w-0">
                             <h2 className="font-sora text-[15px] font-bold tracking-tight text-white truncate">Entra Admin</h2>
                             <p className="text-[10px] font-mono uppercase tracking-[0.15em] text-[#45CFFF]">Control Center</p>
                         </div>
-                    )}
+                    )} */}
                     {/* Desktop collapse toggle */}
                     <button
                         onClick={() => setCollapsed(!collapsed)}
                         className="ml-auto hidden md:flex h-6 w-6 items-center justify-center rounded-md text-[#596887] hover:bg-white/[0.06] hover:text-white transition-colors"
                         title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
                     >
-                        <FaChevronRight
+                        <ChevronRight
                             size={10}
                             className={`transition-transform duration-300 ${collapsed ? "" : "rotate-180"}`}
                         />
@@ -178,7 +190,7 @@ const Sidebar = () => {
                             }`
                         }
                     >
-                        <FaTachometerAlt size={15} className="shrink-0" />
+                        <LayoutDashboard size={18} className="shrink-0" />
                         {!collapsed && <span>Dashboard</span>}
                     </NavLink>
 
@@ -210,11 +222,11 @@ const Sidebar = () => {
                                             : "text-[#8b95ad] hover:bg-white/[0.04] hover:text-white"
                                         }`}
                                 >
-                                    <Icon size={15} className="shrink-0" />
+                                    <Icon size={18} className="shrink-0" />
                                     {!collapsed && (
                                         <>
                                             <span className="flex-1 text-left truncate">{item.name}</span>
-                                            <FaChevronRight
+                                            <ChevronRight
                                                 size={9}
                                                 className={`shrink-0 transition-transform duration-300 text-[#596887] ${isOpenGroup ? "rotate-90" : ""}`}
                                             />
@@ -271,7 +283,7 @@ const Sidebar = () => {
                                     }`
                                 }
                             >
-                                <Icon size={15} className="shrink-0" />
+                                <Icon size={18} className="shrink-0" />
                                 {!collapsed && <span>{item.name}</span>}
                             </NavLink>
                         );
@@ -306,7 +318,7 @@ const Sidebar = () => {
                             className={`mt-2.5 flex items-center gap-2.5 w-full rounded-lg px-3 py-2 text-[12px] font-medium text-[#8b95ad] hover:bg-red-500/10 hover:text-red-400 transition-all duration-200
                                 ${collapsed ? "justify-center px-0" : ""}`}
                         >
-                            <FaSignOutAlt size={13} className="shrink-0" />
+                            <LogOut size={16} className="shrink-0" />
                             {!collapsed && <span>Sign Out</span>}
                         </button>
                     </div>

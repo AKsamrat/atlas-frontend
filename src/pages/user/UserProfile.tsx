@@ -1,9 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
     FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaBuilding,
-    FaCalendarAlt, FaCamera, FaSave, FaLock, FaCheckCircle, FaTimes,
+    FaCalendarAlt, FaCamera, FaSave, FaLock, FaCheckCircle, FaTimes, FaSpinner,
 } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
+import { authApi } from "../../services";
+import Swal from "sweetalert2";
+
+const API_BASE = import.meta.env.VITE_API_URL?.replace(/\/api\/?$/, "") || "http://localhost:8000";
+const imgSrc = (path: string | null | undefined) => path ? (path.startsWith("http") ? path : `${API_BASE}/storage/${path}`) : "";
 
 interface ProfileData {
     name: string;
@@ -28,26 +33,54 @@ const initialProfile: ProfileData = {
 };
 
 export default function UserProfile() {
-    const { user } = useAuth();
+    const { user, updateUser } = useAuth();
     const [profile, setProfile] = useState<ProfileData>({ ...initialProfile, name: user?.name || initialProfile.name, email: user?.email || initialProfile.email });
     const [isEditing, setIsEditing] = useState(false);
     const [showPasswordModal, setShowPasswordModal] = useState(false);
     const [toast, setToast] = useState<string | null>(null);
+    const [saving, setSaving] = useState(false);
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [avatarFile, setAvatarFile] = useState<File | null>(null);
+    const [avatarPreview, setAvatarPreview] = useState<string>("");
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (user) {
             setProfile((prev) => ({ ...prev, name: user.name, email: user.email }));
+            if (user.avatar) setAvatarPreview(imgSrc(user.avatar));
         }
     }, [user]);
 
     const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
 
-    const handleSave = () => {
-        setIsEditing(false);
-        showToast("Profile updated successfully");
+    const handleSave = async () => {
+        try {
+            setSaving(true);
+            const payload: { name?: string; email?: string; avatar?: File } = {};
+            if (profile.name !== (user?.name || "")) payload.name = profile.name;
+            if (profile.email !== (user?.email || "")) payload.email = profile.email;
+            if (avatarFile) payload.avatar = avatarFile;
+
+            if (Object.keys(payload).length === 0) {
+                setIsEditing(false);
+                return;
+            }
+
+            const res = await authApi.updateProfile(payload);
+            const updatedUser = res.data;
+            updateUser({ name: updatedUser.name, email: updatedUser.email, avatar: updatedUser.avatar });
+            if (updatedUser.avatar) setAvatarPreview(imgSrc(updatedUser.avatar));
+            setIsEditing(false);
+            setAvatarFile(null);
+            showToast("Profile updated successfully");
+        } catch (err: unknown) {
+            const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || "Failed to update profile";
+            Swal.fire("Error", msg, "error");
+        } finally {
+            setSaving(false);
+        }
     };
 
     const handleChangePassword = () => {
@@ -59,7 +92,16 @@ export default function UserProfile() {
     };
 
     const handleAvatarChange = () => {
-        showToast("Avatar updated (demo)");
+        fileInputRef.current?.click();
+    };
+
+    const onAvatarFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        if (file.size > 2 * 1024 * 1024) { Swal.fire("Error", "Image must be under 2MB", "error"); return; }
+        setAvatarFile(file);
+        setAvatarPreview(URL.createObjectURL(file));
+        setIsEditing(true);
     };
 
     return (
@@ -78,13 +120,18 @@ export default function UserProfile() {
                 <div className="px-6 pb-6 relative">
                     <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4 -mt-12 relative z-10">
                         <div className="relative group">
-                            <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[#45CFFF] to-[#1E56E0] flex items-center justify-center text-white text-3xl font-sora font-bold border-4 border-white dark:border-[#0F1E3D] shadow-xl">
-                                {profile.name.charAt(0)}
-                            </div>
+                            {avatarPreview ? (
+                                <img src={avatarPreview} alt={profile.name} className="w-24 h-24 rounded-2xl object-cover border-4 border-white dark:border-[#0F1E3D] shadow-xl" />
+                            ) : (
+                                <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[#45CFFF] to-[#1E56E0] flex items-center justify-center text-white text-3xl font-sora font-bold border-4 border-white dark:border-[#0F1E3D] shadow-xl">
+                                    {profile.name.charAt(0)}
+                                </div>
+                            )}
                             <button onClick={handleAvatarChange}
                                 className="absolute bottom-0 right-0 w-8 h-8 rounded-lg bg-[#1E56E0] text-white flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
                                 <FaCamera size={12} />
                             </button>
+                            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={onAvatarFileChange} />
                         </div>
                         <div className="flex-1 sm:pb-1">
                             <h2 className="font-sora text-xl font-bold text-[#1a1f36] dark:text-white">{profile.name}</h2>
@@ -96,9 +143,10 @@ export default function UserProfile() {
                                 <FaLock size={12} /> Change Password
                             </button>
                             <button onClick={() => isEditing ? handleSave() : setIsEditing(true)}
+                                disabled={saving}
                                 className={`px-4 py-2 rounded-xl text-sm font-medium text-white transition-all flex items-center gap-2 ${isEditing ? "bg-green-500 hover:bg-green-600" : "bg-gradient-to-r from-[#1E56E0] to-[#45CFFF] hover:opacity-90"
-                                    }`}>
-                                {isEditing ? <><FaSave size={12} /> Save Changes</> : <><FaUser size={12} /> Edit Profile</>}
+                                    } disabled:opacity-50`}>
+                                {saving ? <><FaSpinner className="animate-spin" size={12} /> Saving...</> : isEditing ? <><FaSave size={12} /> Save Changes</> : <><FaUser size={12} /> Edit Profile</>}
                             </button>
                         </div>
                     </div>

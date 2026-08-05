@@ -1,7 +1,7 @@
 import { ArrowRight, CheckCircle, Target, Shield, TrendingUp, Award, ThumbsUp, ShoppingCart } from "lucide-react";
 import FinalCTA from "../components/home/FinalCTA";
 import { useContent } from "../context/ContentContext";
-import { useCart } from "../store/cartStore";
+import { useCart } from "../store/useCart";
 
 export default function LikesFollowers() {
     const { content } = useContent();

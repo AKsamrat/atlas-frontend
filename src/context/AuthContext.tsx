@@ -10,7 +10,7 @@ export interface User {
     id: string;
     name: string;
     email: string;
-    role: "admin" | "user";
+    role: "admin" | "user" | "customer";
     avatar?: string;
 }
 
@@ -18,8 +18,9 @@ interface AuthContextValue {
     user: User | null;
     loading: boolean;
     login: (email: string, password: string) => Promise<User | null>;
-    register: (name: string, email: string, password: string) => Promise<User | null>;
+    register: (name: string, email: string, password: string) => Promise<{ user: User | null; error?: string }>;
     logout: () => void;
+    updateUser: (updates: Partial<User>) => void;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -97,7 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, []);
 
     const register = useCallback(
-        async (name: string, email: string, password: string): Promise<User | null> => {
+        async (name: string, email: string, password: string): Promise<{ user: User | null; error?: string }> => {
             try {
                 const res = await authApi.register(name, email, password, password);
                 const { user: apiUser, token } = res.data;
@@ -106,9 +107,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
                 const mappedUser = mapApiUser(apiUser);
                 setUser(mappedUser);
-                return mappedUser;
-            } catch {
-                return null;
+                return { user: mappedUser };
+            } catch (err: any) {
+                // Extract actual error message from Laravel validation response
+                const status = err?.response?.status;
+                const data = err?.response?.data;
+
+                if (status === 422 && data?.errors) {
+                    // Laravel returns { errors: { email: [...], password: [...] } }
+                    const firstKey = Object.keys(data.errors)[0];
+                    const msg = data.errors[firstKey]?.[0] || data.message || "Registration failed";
+                    return { user: null, error: msg };
+                }
+
+                return { user: null, error: data?.message || "Registration failed. Please try again." };
             }
         },
         [],
@@ -126,8 +138,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     }, []);
 
+    const updateUser = useCallback((updates: Partial<User>) => {
+        setUser((prev) => {
+            if (!prev) return prev;
+            return { ...prev, ...updates };
+        });
+    }, []);
+
     return (
-        <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+        <AuthContext.Provider value={{ user, loading, login, register, logout, updateUser }}>
             {children}
         </AuthContext.Provider>
     );

@@ -1,6 +1,6 @@
 import { FileText, Palette, CheckCircle2, ArrowRight, Sparkles, Layers, Image, PenTool, ShoppingCart } from "lucide-react";
 import { useContent } from "../context/ContentContext";
-import { useCart } from "../store/cartStore";
+import { useCart } from "../store/useCart";
 
 /* ------------------------------------------------------------------ */
 /*  Entra Global Tech — Flyer Design Page                             */

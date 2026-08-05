@@ -131,9 +131,19 @@ export default function Testimonials() {
 
                                     {/* author */}
                                     <div className="mt-6 flex items-center gap-3 border-t border-black/6 pt-5 dark:border-white/[0.06]">
-                                        {/* avatar placeholder */}
-                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#45CFFF] to-[#1E56E0] font-sora text-sm font-bold text-[#060B14]">
-                                            {t.name.split(" ").map((n) => n[0]).join("")}
+                                        {/* avatar */}
+                                        <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full bg-gradient-to-br from-[#45CFFF] to-[#1E56E0]">
+                                            {t.image ? (
+                                                <img
+                                                    src={t.image.startsWith("http") ? t.image : `${import.meta.env.VITE_API_URL?.replace("/api", "")}/storage/${t.image}`}
+                                                    alt={t.name}
+                                                    className="h-full w-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className="flex h-full w-full items-center justify-center font-sora text-sm font-bold text-[#060B14]">
+                                                    {t.name.split(" ").map((n) => n[0]).join("")}
+                                                </div>
+                                            )}
                                         </div>
                                         <div>
                                             <b className="block font-sora text-[0.88rem] font-semibold text-[#1a1f36] dark:text-white">

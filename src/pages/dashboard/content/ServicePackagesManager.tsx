@@ -89,7 +89,7 @@ export default function ServicePackagesManager() {
     const addPlan = () => {
         setPlans((prev) => [
             ...prev,
-            { id: 0, service_key: activeTab, name: "New Plan", price: "0", period: "", tagline: "Plan description", highlight: false, features: ["Feature 1"], cta: "Get Started", sort_order: prev.length },
+            { id: 0, service_key: activeTab, name: "New Plan", price: "0", period: "/mo", tagline: "Plan description", highlight: false, features: ["Feature 1"], cta: "Get Started", sort_order: prev.length },
         ]);
     };
 
@@ -106,7 +106,7 @@ export default function ServicePackagesManager() {
         try {
             const results = await Promise.all(
                 plans.map((p) => {
-                    const payload = { ...p, service_key: activeTab };
+                    const payload = { ...p, period: p.period || "/mo", service_key: activeTab };
                     if (p.id && p.id > 0) {
                         return servicePackagesApi.update(p.id, payload);
                     } else {

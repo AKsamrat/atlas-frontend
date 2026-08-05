@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import DomainChecker from "../components/home/DomainChecker";
 import { useContent } from "../context/ContentContext";
-import { useCart } from "../store/cartStore";
+import { useCart } from "../store/useCart";
 
 /* ------------------------------------------------------------------ */
 /*  Entra Global Tech — Domain & Hosting Landing Page                 */

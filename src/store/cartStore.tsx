@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useReducer, type ReactNode } from "react";
+import { useCallback, useEffect, useReducer, type ReactNode } from "react";
 
 /* ------------------------------------------------------------------ */
 /*  Cart Store — Context + Reducer with localStorage persistence       */
@@ -89,19 +89,8 @@ function getStoredCart(): CartState {
     }
 }
 
-/* ---- Context ---- */
-
-interface CartContextValue {
-    items: CartItem[];
-    totalItems: number;
-    totalPrice: string;
-    addItem: (item: Omit<CartItem, "quantity">) => void;
-    removeItem: (id: string) => void;
-    updateQuantity: (id: string, quantity: number) => void;
-    clearCart: () => void;
-}
-
-const CartContext = createContext<CartContextValue | undefined>(undefined);
+/* ---- Context (lives in useCart.ts) ---- */
+import { CartContext } from "./useCart";
 
 export function CartProvider({ children }: { children: ReactNode }) {
     const [state, dispatch] = useReducer(cartReducer, undefined, getStoredCart);
@@ -156,8 +145,4 @@ export function CartProvider({ children }: { children: ReactNode }) {
     );
 }
 
-export function useCart(): CartContextValue {
-    const ctx = useContext(CartContext);
-    if (!ctx) throw new Error("useCart must be used within a CartProvider");
-    return ctx;
-}
+

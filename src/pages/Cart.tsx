@@ -13,8 +13,11 @@ import {
     Mail,
     Phone,
     Globe,
+    Loader2,
 } from "lucide-react";
-import { useCart } from "../store/cartStore";
+import { useCart } from "../store/useCart";
+import { useAuth } from "../context/AuthContext";
+import { ordersApi } from "../services";
 import Swal from "sweetalert2";
 
 /* ------------------------------------------------------------------ */
@@ -33,10 +36,14 @@ const INITIAL_FORM: CheckoutForm = { name: "", email: "", phone: "", country: ""
 
 export default function Cart() {
     const { items, totalItems, totalPrice, removeItem, updateQuantity, clearCart } = useCart();
+    const { user } = useAuth();
     const [checkoutOpen, setCheckoutOpen] = useState(false);
-    const [form, setForm] = useState<CheckoutForm>(INITIAL_FORM);
+    const [form, setForm] = useState<CheckoutForm>(() =>
+        user ? { name: user.name, email: user.email, phone: "", country: "" } : INITIAL_FORM
+    );
     const [errors, setErrors] = useState<Partial<Record<keyof CheckoutForm, string>>>({});
     const [submitted, setSubmitted] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
 
     const handleChange = (field: keyof CheckoutForm, value: string) => {
         setForm((prev) => ({ ...prev, [field]: value }));
@@ -54,39 +61,49 @@ export default function Cart() {
         return Object.keys(e).length === 0;
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!validate()) return;
 
-        const order = {
-            customer: form,
-            items: items.map((item) => ({
-                id: item.id,
-                name: item.name,
-                serviceKey: item.serviceKey,
-                price: item.price,
-                period: item.period,
-                quantity: item.quantity,
-            })),
-            total: totalPrice,
-            createdAt: new Date().toISOString(),
-        };
+        setSubmitting(true);
+        try {
+            await ordersApi.create({
+                customer_name: form.name,
+                customer_email: form.email,
+                customer_phone: form.phone,
+                customer_country: form.country,
+                items: items.map((item) => ({
+                    service_key: item.serviceKey,
+                    name: item.name,
+                    price: item.price,
+                    period: item.period,
+                    quantity: item.quantity,
+                })),
+            });
 
-        const orders = JSON.parse(localStorage.getItem("entra-orders") || "[]");
-        orders.push(order);
-        localStorage.setItem("entra-orders", JSON.stringify(orders));
+            clearCart();
+            setSubmitted(true);
 
-        clearCart();
-        setSubmitted(true);
-
-        Swal.fire({
-            icon: "success",
-            title: "Order Placed!",
-            text: "Thank you! We'll contact you shortly to confirm your order.",
-            confirmButtonColor: "#1E56E0",
-            background: "#0F1E3D",
-            color: "#fff",
-        });
+            Swal.fire({
+                icon: "success",
+                title: "Order Placed!",
+                text: "Thank you! We'll contact you shortly to confirm your order.",
+                confirmButtonColor: "#1E56E0",
+                background: "#0F1E3D",
+                color: "#fff",
+            });
+        } catch {
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong placing your order. Please try again.",
+                confirmButtonColor: "#1E56E0",
+                background: "#0F1E3D",
+                color: "#fff",
+            });
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     /* ---- Empty / Thank-you state ---- */
@@ -369,9 +386,14 @@ export default function Cart() {
 
                                         <button
                                             type="submit"
-                                            className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#45CFFF] to-[#1E56E0] px-6 py-3.5 text-[0.95rem] font-semibold text-[#060B14] shadow-[0_8px_24px_rgba(46,139,240,0.35)] transition-all duration-300 hover:shadow-[0_12px_32px_rgba(46,139,240,0.5)]"
+                                            disabled={submitting}
+                                            className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#45CFFF] to-[#1E56E0] px-6 py-3.5 text-[0.95rem] font-semibold text-[#060B14] shadow-[0_8px_24px_rgba(46,139,240,0.35)] transition-all duration-300 hover:shadow-[0_12px_32px_rgba(46,139,240,0.5)] disabled:opacity-60 disabled:cursor-not-allowed"
                                         >
-                                            <CheckCircle2 size={16} /> Place Order — ৳{totalPrice}
+                                            {submitting ? (
+                                                <><Loader2 size={16} className="animate-spin" /> Placing Order...</>
+                                            ) : (
+                                                <><CheckCircle2 size={16} /> Place Order — ৳{totalPrice}</>
+                                            )}
                                         </button>
 
                                         <button

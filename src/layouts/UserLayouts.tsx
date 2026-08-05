@@ -1,5 +1,6 @@
 import { Outlet, useLocation } from "react-router-dom";
 import UserSidebar from "../components/user/UserSidebar";
+import { useAuth } from "../context/AuthContext";
 
 const pageTitles: Record<string, string> = {
     "/user": "My Dashboard",
@@ -13,8 +14,8 @@ const UserLayout = () => {
     const location = useLocation();
     const pageName = pageTitles[location.pathname] || "Dashboard";
 
-    const userStr = localStorage.getItem("entra-auth-user");
-    const currentUser = userStr ? JSON.parse(userStr) : { name: "User", email: "user@email.com" };
+    const { user } = useAuth();
+    const currentUser = user || { name: "User", email: "user@email.com" };
 
     return (
         <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#060B14] flex">
@@ -34,9 +35,19 @@ const UserLayout = () => {
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <span className="text-sm text-[#596887] dark:text-[#B9C7E0]">Welcome, {currentUser.name}</span>
-                                    <div className="w-9 h-9 bg-gradient-to-br from-[#45CFFF] to-[#1E56E0] rounded-full flex items-center justify-center">
-                                        <span className="text-white text-sm font-bold">{currentUser.name[0]?.toUpperCase() || "U"}</span>
-                                    </div>
+                                    {'avatar' in currentUser && currentUser.avatar ? (
+                                        <img
+                                            src={(currentUser as { avatar?: string }).avatar!.startsWith("http")
+                                                ? (currentUser as { avatar?: string }).avatar!
+                                                : `${import.meta.env.VITE_API_URL?.replace("/api", "")}/storage/${(currentUser as { avatar?: string }).avatar!}`}
+                                            alt={currentUser.name}
+                                            className="w-9 h-9 rounded-full object-cover border-2 border-[#45CFFF]/30 shadow-[0_2px_8px_rgba(69,207,255,0.15)]"
+                                        />
+                                    ) : (
+                                        <div className="w-9 h-9 bg-gradient-to-br from-[#45CFFF] to-[#1E56E0] rounded-full flex items-center justify-center">
+                                            <span className="text-white text-sm font-bold">{currentUser.name[0]?.toUpperCase() || "U"}</span>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>

@@ -48,5 +48,46 @@
     .theme-border-accent { @apply border-black/10 dark:border-white/[0.09]; }
 }
 
+/* ================================================================
+   Custom Scrollbar — Sidebar & Global
+   ================================================================ */
+/* Thin scrollbar for sidebars and nav panels */
+.scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(69, 207, 255, 0.15) transparent;
+}
+.scrollbar-thin::-webkit-scrollbar {
+    width: 5px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(69, 207, 255, 0.25), rgba(30, 86, 224, 0.25));
+    border-radius: 10px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, rgba(69, 207, 255, 0.45), rgba(30, 86, 224, 0.45));
+}
+
+/* Default wider scrollbar for page content */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: rgba(6, 11, 20, 0.3);
+}
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(69, 207, 255, 0.2), rgba(30, 86, 224, 0.2));
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, rgba(69, 207, 255, 0.4), rgba(30, 86, 224, 0.4));
+}
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(69, 207, 255, 0.15) transparent;
+}
+
 
 

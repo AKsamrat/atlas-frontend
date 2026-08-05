@@ -9,6 +9,8 @@ import Employees from "../pages/dashboard/Employees";
 import Attendance from "../pages/dashboard/Attendance";
 import LeaveManagement from "../pages/dashboard/LeaveManagement";
 import Departments from "../pages/dashboard/Departments";
+import DailySubmissions from "../pages/dashboard/DailySubmissions";
+import Subscribers from "../pages/dashboard/Subscribers";
 import Payroll from "../pages/dashboard/Payroll";
 import Orders from "../pages/dashboard/Orders";
 import Users from "../pages/dashboard/Users";
@@ -23,6 +25,7 @@ import TestimonialsManager from "../pages/dashboard/content/TestimonialsManager"
 import ContactManager from "../pages/dashboard/content/ContactManager";
 import DomainPackagesManager from "../pages/dashboard/content/DomainPackagesManager";
 import ServicePackagesManager from "../pages/dashboard/content/ServicePackagesManager";
+import Settings from "../pages/dashboard/Settings";
 import CommonLayout from "../layouts/CommonLayouts";
 import DashboardLayout from "../layouts/DashboardLayouts";
 import UserLayout from "../layouts/UserLayouts";
@@ -31,6 +34,11 @@ import UserProfile from "../pages/user/UserProfile";
 import UserAttendance from "../pages/user/UserAttendance";
 import UserLeave from "../pages/user/UserLeave";
 import UserSalary from "../pages/user/UserSalary";
+import UserDailySubmission from "../pages/user/UserDailySubmission";
+import CustomerLayout from "../layouts/CustomerLayouts";
+import CustomerDashboard from "../pages/customer/CustomerDashboard";
+import CustomerOrders from "../pages/customer/CustomerOrders";
+import CustomerProfile from "../pages/customer/CustomerProfile";
 import Shope from "../pages/Shope";
 import Product from "../pages/dashboard/Product";
 import WeCare from "../pages/WeCare";
@@ -54,6 +62,7 @@ import PrivacyPolicy from "../pages/PrivacyPolicy";
 import TermsOfService from "../pages/TermsOfService";
 import HelpCenter from "../pages/HelpCenter";
 import Blog from "../pages/Blog";
+import ProtectedRoute from "./ProtectedRoute";
 
 const AppRoutes = () => {
     return (
@@ -91,8 +100,8 @@ const AppRoutes = () => {
                 <Route path="/contact" element={<Contact />} />
             </Route>
 
-            {/* Dashboard Routes */}
-            <Route path="/dashboard" element={<DashboardLayout />}>
+            {/* Dashboard Routes — admin only */}
+            <Route path="/dashboard" element={<ProtectedRoute allowedRoles={["admin"]}><DashboardLayout /></ProtectedRoute>}>
                 <Route index element={<DashboardHome />} />
                 <Route path="products" element={<Product />} />
                 <Route path="orders" element={<Orders />} />
@@ -100,6 +109,7 @@ const AppRoutes = () => {
                 <Route path="employees" element={<Employees />} />
                 <Route path="attendance" element={<Attendance />} />
                 <Route path="leave" element={<LeaveManagement />} />
+                <Route path="daily-submissions" element={<DailySubmissions />} />
                 <Route path="departments" element={<Departments />} />
                 <Route path="payroll" element={<Payroll />} />
                 <Route path="customers" element={<Customers />} />
@@ -114,15 +124,25 @@ const AppRoutes = () => {
                 <Route path="content/contact" element={<ContactManager />} />
                 <Route path="content/domain-packages" element={<DomainPackagesManager />} />
                 <Route path="content/service-packages" element={<ServicePackagesManager />} />
+                <Route path="subscribers" element={<Subscribers />} />
+                <Route path="settings" element={<Settings />} />
             </Route>
 
-            {/* User Panel Routes */}
-            <Route path="/user" element={<UserLayout />}>
+            {/* User Panel Routes — employees */}
+            <Route path="/user" element={<ProtectedRoute allowedRoles={["user"]}><UserLayout /></ProtectedRoute>}>
                 <Route index element={<UserDashboard />} />
                 <Route path="profile" element={<UserProfile />} />
                 <Route path="attendance" element={<UserAttendance />} />
                 <Route path="leave" element={<UserLeave />} />
                 <Route path="salary" element={<UserSalary />} />
+                <Route path="daily-submission" element={<UserDailySubmission />} />
+            </Route>
+
+            {/* Customer Panel Routes */}
+            <Route path="/customer" element={<ProtectedRoute allowedRoles={["customer"]}><CustomerLayout /></ProtectedRoute>}>
+                <Route index element={<CustomerDashboard />} />
+                <Route path="orders" element={<CustomerOrders />} />
+                <Route path="profile" element={<CustomerProfile />} />
             </Route>
         </Routes>
     );

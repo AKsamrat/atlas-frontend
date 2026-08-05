@@ -38,6 +38,7 @@ export interface TestimonialData {
     role: string;
     stars: number;
     text: string;
+    image?: string | null;
 }
 
 export interface ContactInfoData {
@@ -362,6 +363,7 @@ function mapApiTestimonials(items: import("../services").TestimonialData[]): Tes
             role: t.role,
             stars: t.stars,
             text: t.text,
+            image: t.image,
         }));
 }
 

@@ -21,9 +21,16 @@ import logo from "../../assets/entra-logo.png";
 import { FaFacebook, FaInstagram } from "react-icons/fa";
 import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../context/AuthContext";
-import { useCart } from "../../store/cartStore";
+import { useCart } from "../../store/useCart";
 
 import { type IconType } from "react-icons";
+
+/** Resolve avatar URL — backend may store relative paths like "avatars/xxx.jpg" */
+function getAvatarUrl(avatar: string | undefined): string | null {
+    if (!avatar) return null;
+    if (avatar.startsWith("http")) return avatar;
+    return `${import.meta.env.VITE_API_URL?.replace("/api", "")}/storage/${avatar}`;
+}
 
 /**
  * Entra Global Tech — Responsive Navbar
@@ -333,7 +340,11 @@ export default function Navbar() {
                                 }`}
                         >
                             {user ? (
-                                <span className="text-sm font-bold font-sora">{user.name.charAt(0).toUpperCase()}</span>
+                                getAvatarUrl(user.avatar) ? (
+                                    <img src={getAvatarUrl(user.avatar)!} alt={user.name} className="w-full h-full rounded-full object-cover" />
+                                ) : (
+                                    <span className="text-sm font-bold font-sora">{user.name.charAt(0).toUpperCase()}</span>
+                                )
                             ) : (
                                 <User size={19} />
                             )}
@@ -346,8 +357,19 @@ export default function Navbar() {
                                     <>
                                         {/* Logged in state */}
                                         <div className="px-4 py-3 border-b border-[#E2E8F0] dark:border-[#2D3748]">
-                                            <p className="text-sm font-semibold text-[#1a1f36] dark:text-white truncate">{user.name}</p>
-                                            <p className="text-xs text-[#718096] dark:text-[#A0AEC0] truncate">{user.email}</p>
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#45CFFF] to-[#1E56E0] flex items-center justify-center text-white text-sm font-bold shrink-0 overflow-hidden">
+                                                    {getAvatarUrl(user.avatar) ? (
+                                                        <img src={getAvatarUrl(user.avatar)!} alt={user.name} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        user.name.charAt(0).toUpperCase()
+                                                    )}
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <p className="text-sm font-semibold text-[#1a1f36] dark:text-white truncate">{user.name}</p>
+                                                    <p className="text-xs text-[#718096] dark:text-[#A0AEC0] truncate">{user.email}</p>
+                                                </div>
+                                            </div>
                                             <span className="inline-block mt-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-[#45CFFF]/10 text-[#45CFFF] uppercase">
                                                 {user.role}
                                             </span>

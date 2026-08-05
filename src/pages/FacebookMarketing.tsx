@@ -2,7 +2,7 @@ import { ArrowRight, CheckCircle, Target, Users, BarChart2, Megaphone, ShoppingC
 import { FaFacebook } from "react-icons/fa";
 import FinalCTA from "../components/home/FinalCTA";
 import { useContent } from "../context/ContentContext";
-import { useCart } from "../store/cartStore";
+import { useCart } from "../store/useCart";
 
 
 export default function FacebookMarketing() {

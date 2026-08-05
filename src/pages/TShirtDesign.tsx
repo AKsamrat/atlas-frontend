@@ -1,6 +1,6 @@
 import { Shirt, Palette, CheckCircle2, ArrowRight, Sparkles, Layers, Image, FileText, ShoppingCart } from "lucide-react";
 import { useContent } from "../context/ContentContext";
-import { useCart } from "../store/cartStore";
+import { useCart } from "../store/useCart";
 
 /* ------------------------------------------------------------------ */
 /*  Entra Global Tech — T-Shirt Design Page                           */
@@ -234,76 +234,80 @@ export default function TShirtDesign() {
                                 >
                                     <ShoppingCart size={15} /> Add to Cart
                                 </button>
-                                <section id="process" className="relative px-5 py-20 sm:px-8 md:px-16">
-                                    <div className="mx-auto max-w-7xl">
-                                        <div className="mx-auto max-w-2xl text-center">
-                                            <span className="inline-flex items-center gap-2 font-mono text-[12.5px] uppercase tracking-[0.22em] text-[#45CFFF]">
-                                                <span className="inline-block h-px w-7 bg-[#45CFFF]" />
-                                                Our Process
-                                            </span>
-                                            <h2 className="mt-5 font-sora text-[2rem] font-bold leading-tight text-[#1a1f36] sm:text-[2.5rem] dark:text-white">
-                                                From idea to wardrobe in four steps.
-                                            </h2>
-                                        </div>
-
-                                        <div className="relative mt-14 grid gap-8 md:grid-cols-4">
-                                            <div className="pointer-events-none absolute left-1/6 right-1/6 top-8 hidden h-px bg-gradient-to-r from-transparent via-[#45CFFF]/30 to-transparent md:block" />
-
-                                            {PROCESS_STEPS.map((step) => (
-                                                <div key={step.num} className="relative text-center">
-                                                    <span className="mx-auto mb-5 inline-flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#45CFFF] to-[#1E56E0] font-mono text-sm font-bold text-[#060B14] shadow-[0_8px_24px_rgba(46,139,240,0.4)]">
-                                                        {step.num}
-                                                    </span>
-                                                    <h3 className="font-sora text-[1.15rem] font-bold text-[#1a1f36] dark:text-white">{step.title}</h3>
-                                                    <p className="mx-auto mt-2 max-w-[32ch] text-[0.9rem] leading-relaxed text-[#8b95ad] dark:text-[#7C8AAD]">{step.desc}</p>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </section>
-
-                                {/* ============================================================ */}
-                                {/*  CTA BANNER                                                  */}
-                                {/* ============================================================ */}
-                                <section className="relative px-5 pb-20 sm:px-8 md:px-16">
-                                    <div className="mx-auto max-w-7xl">
-                                        <div className="overflow-hidden rounded-[28px] border border-black/8 bg-gradient-to-br from-white via-[#f1f3f8] to-[#e8ecf4] p-10 sm:p-14 text-center dark:border-white/[0.09] dark:from-[#0F1E3D] dark:via-[#0B1730] dark:to-[#060B14]">
-                                            <div
-                                                className="pointer-events-none absolute -left-20 -top-20 h-64 w-64 rounded-full opacity-30 blur-3xl"
-                                                style={{ background: "radial-gradient(circle, #45CFFF, transparent 70%)" }}
-                                            />
-                                            <div
-                                                className="pointer-events-none absolute -bottom-20 -right-20 h-64 w-64 rounded-full opacity-20 blur-3xl"
-                                                style={{ background: "radial-gradient(circle, #1E56E0, transparent 70%)" }}
-                                            />
-
-                                            <div className="relative z-10">
-                                                <h2 className="font-sora text-[2rem] font-bold leading-tight text-[#1a1f36] sm:text-[2.5rem] dark:text-white">
-                                                    Ready to launch your merch?
-                                                </h2>
-                                                <p className="mx-auto mt-4 max-w-[48ch] text-[1rem] leading-relaxed text-[#596887] dark:text-[#B9C7E0]">
-                                                    Tell us about your brand, audience, and garment needs. We'll send a proposal within 24 hours.
-                                                </p>
-                                                <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-                                                    <a
-                                                        href="/contact"
-                                                        className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#45CFFF] to-[#1E56E0] px-7 py-3.5 text-[0.95rem] font-semibold text-[#060B14] shadow-[0_10px_30px_rgba(46,139,240,0.35)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_36px_rgba(46,139,240,0.5)]"
-                                                    >
-                                                        Start a Project <ArrowRight size={16} />
-                                                    </a>
-                                                    <a
-                                                        href="#plans"
-                                                        className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-black/[0.03] px-7 py-3.5 text-[0.95rem] font-semibold transition-all duration-300 hover:bg-black/[0.06] dark:border-white/12 dark:bg-white/[0.03] dark:hover:bg-white/[0.06]"
-                                                    >
-                                                        View Pricing
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </section>
                             </div>
-                        ));
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* ============================================================ */}
+            {/*  PROCESS                                                     */}
+            {/* ============================================================ */}
+            <section id="process" className="relative px-5 py-20 sm:px-8 md:px-16">
+                <div className="mx-auto max-w-7xl">
+                    <div className="mx-auto max-w-2xl text-center">
+                        <span className="inline-flex items-center gap-2 font-mono text-[12.5px] uppercase tracking-[0.22em] text-[#45CFFF]">
+                            <span className="inline-block h-px w-7 bg-[#45CFFF]" />
+                            Our Process
+                        </span>
+                        <h2 className="mt-5 font-sora text-[2rem] font-bold leading-tight text-[#1a1f36] sm:text-[2.5rem] dark:text-white">
+                            From idea to wardrobe in four steps.
+                        </h2>
+                    </div>
+
+                    <div className="relative mt-14 grid gap-8 md:grid-cols-4">
+                        <div className="pointer-events-none absolute left-1/6 right-1/6 top-8 hidden h-px bg-gradient-to-r from-transparent via-[#45CFFF]/30 to-transparent md:block" />
+
+                        {PROCESS_STEPS.map((step) => (
+                            <div key={step.num} className="relative text-center">
+                                <span className="mx-auto mb-5 inline-flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#45CFFF] to-[#1E56E0] font-mono text-sm font-bold text-[#060B14] shadow-[0_8px_24px_rgba(46,139,240,0.4)]">
+                                    {step.num}
+                                </span>
+                                <h3 className="font-sora text-[1.15rem] font-bold text-[#1a1f36] dark:text-white">{step.title}</h3>
+                                <p className="mx-auto mt-2 max-w-[32ch] text-[0.9rem] leading-relaxed text-[#8b95ad] dark:text-[#7C8AAD]">{step.desc}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* ============================================================ */}
+            {/*  CTA BANNER                                                  */}
+            {/* ============================================================ */}
+            <section className="relative px-5 pb-20 sm:px-8 md:px-16">
+                <div className="mx-auto max-w-7xl">
+                    <div className="overflow-hidden rounded-[28px] border border-black/8 bg-gradient-to-br from-white via-[#f1f3f8] to-[#e8ecf4] p-10 sm:p-14 text-center dark:border-white/[0.09] dark:from-[#0F1E3D] dark:via-[#0B1730] dark:to-[#060B14]">
+                        <div
+                            className="pointer-events-none absolute -left-20 -top-20 h-64 w-64 rounded-full opacity-30 blur-3xl"
+                            style={{ background: "radial-gradient(circle, #45CFFF, transparent 70%)" }}
+                        />
+                        <div
+                            className="pointer-events-none absolute -bottom-20 -right-20 h-64 w-64 rounded-full opacity-20 blur-3xl"
+                            style={{ background: "radial-gradient(circle, #1E56E0, transparent 70%)" }}
+                        />
+
+                        <div className="relative z-10">
+                            <h2 className="font-sora text-[2rem] font-bold leading-tight text-[#1a1f36] sm:text-[2.5rem] dark:text-white">
+                                Ready to launch your merch?
+                            </h2>
+                            <p className="mx-auto mt-4 max-w-[48ch] text-[1rem] leading-relaxed text-[#596887] dark:text-[#B9C7E0]">
+                                Tell us about your brand, audience, and garment needs. We'll send a proposal within 24 hours.
+                            </p>
+                            <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+                                <a
+                                    href="/contact"
+                                    className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#45CFFF] to-[#1E56E0] px-7 py-3.5 text-[0.95rem] font-semibold text-[#060B14] shadow-[0_10px_30px_rgba(46,139,240,0.35)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_36px_rgba(46,139,240,0.5)]"
+                                >
+                                    Start a Project <ArrowRight size={16} />
+                                </a>
+                                <a
+                                    href="#plans"
+                                    className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-black/[0.03] px-7 py-3.5 text-[0.95rem] font-semibold transition-all duration-300 hover:bg-black/[0.06] dark:border-white/12 dark:bg-white/[0.03] dark:hover:bg-white/[0.06]"
+                                >
+                                    View Pricing
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>

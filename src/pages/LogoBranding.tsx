@@ -1,6 +1,6 @@
 import { Sparkles, Palette, CheckCircle2, ArrowRight, Layers, Target, Shield, ShoppingCart } from "lucide-react";
 import { useContent } from "../context/ContentContext";
-import { useCart } from "../store/cartStore";
+import { useCart } from "../store/useCart";
 
 /* ------------------------------------------------------------------ */
 /*  Entra Global Tech — Logo & Branding Page                          */

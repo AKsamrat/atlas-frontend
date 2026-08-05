@@ -8,11 +8,13 @@ import {
     FaCalendarCheck,
     FaHistory,
     FaMoneyBillWave,
+    FaClipboardList,
     FaBars,
     FaChevronDown,
     FaSignOutAlt,
 } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
+import entraLogo from "../../assets/entra-logo.png";
 
 const userRoutes: Array<{ name: string; path?: string; icon: React.ReactNode; children?: Array<{ name: string; path: string }> }> = [
     {
@@ -44,6 +46,11 @@ const userRoutes: Array<{ name: string; path?: string; icon: React.ReactNode; ch
         name: "Salary",
         path: "/user/salary",
         icon: <FaMoneyBillWave />,
+    },
+    {
+        name: "Daily Submission",
+        path: "/user/daily-submission",
+        icon: <FaClipboardList />,
     },
 ];
 
@@ -84,12 +91,12 @@ const UserSidebar = () => {
                 {/* Brand */}
                 <div className="px-5 py-5 border-b border-[#E2E8F0] dark:border-[#2D3748]">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#45CFFF] to-[#1E56E0] flex items-center justify-center shadow-lg">
-                            <span className="text-white font-sora font-bold text-sm">AT</span>
+                        <div className="flex items-center justify-center rounded-xl bg-white p-1.5 shadow-sm">
+                            <img src={entraLogo} alt="Entra Global Tech" className="h-8 w-auto" />
                         </div>
                         <div>
-                            <h2 className="font-sora font-bold text-[#1a1f36] dark:text-white text-sm leading-tight">Atlas</h2>
-                            <p className="text-[10px] text-[#718096] dark:text-[#A0AEC0] font-mono uppercase">User Panel</p>
+                            <h2 className="font-sora font-bold text-[#1a1f36] dark:text-white text-sm leading-tight">Entra</h2>
+                            <p className="text-[10px] text-[#718096] dark:text-[#A0AEC0] font-mono uppercase">Employee Panel</p>
                         </div>
                     </div>
                 </div>
@@ -137,9 +144,17 @@ const UserSidebar = () => {
                 {/* User Info + Logout */}
                 <div className="p-3 border-t border-[#E2E8F0] dark:border-[#2D3748]">
                     <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#F9FAFC] dark:bg-[#060B14] mb-2">
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#45CFFF] to-[#1E56E0] flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
-                            {user?.name?.charAt(0).toUpperCase() || "U"}
-                        </div>
+                        {user?.avatar ? (
+                            <img
+                                src={user.avatar.startsWith("http") ? user.avatar : `${import.meta.env.VITE_API_URL?.replace("/api", "")}/storage/${user.avatar}`}
+                                alt={user?.name || "User"}
+                                className="w-9 h-9 rounded-full object-cover border-2 border-[#45CFFF]/30 flex-shrink-0"
+                            />
+                        ) : (
+                            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#45CFFF] to-[#1E56E0] flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                                {user?.name?.charAt(0).toUpperCase() || "U"}
+                            </div>
+                        )}
                         <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-[#1a1f36] dark:text-white truncate">{user?.name || "User"}</p>
                             <p className="text-xs text-[#718096] dark:text-[#A0AEC0] truncate">{user?.email || "user@email.com"}</p>

@@ -14,7 +14,7 @@ import {
     ShoppingCart,
 } from "lucide-react";
 import { useContent } from "../context/ContentContext";
-import { useCart } from "../store/cartStore";
+import { useCart } from "../store/useCart";
 
 /* ------------------------------------------------------------------ */
 /*  Entra Global Tech — Web Development Landing Page                   */
@@ -306,99 +306,108 @@ export default function WebDevelopment() {
                                 >
                                     <ShoppingCart size={15} /> Add to Cart
                                 </button>
-                                <section className="relative px-5 py-20 sm:px-8 md:px-16">
-                                    <div className="mx-auto max-w-7xl">
-                                        <div className="grid gap-12 md:grid-cols-2 md:items-center">
-                                            {/* left copy */}
-                                            <div>
-                                                <span className="inline-flex items-center gap-2 font-mono text-[12.5px] uppercase tracking-[0.22em] text-[#45CFFF]">
-                                                    <span className="inline-block h-px w-7 bg-[#45CFFF]" />
-                                                    Why Entra
-                                                </span>
-                                                <h2 className="mt-5 font-sora text-[2rem] font-bold leading-tight text-[#1a1f36] sm:text-[2.5rem] dark:text-white">
-                                                    We don't just build websites. We build growth engines.
-                                                </h2>
-                                                <p className="mt-4 text-[1rem] leading-relaxed text-[#596887] dark:text-[#B9C7E0]">
-                                                    Every site we deliver is optimized for speed, search engines and conversions — so it doesn't
-                                                    just look great, it actually drives results for your business.
-                                                </p>
-                                                <a
-                                                    href="/contact"
-                                                    className="mt-7 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#2E8BF0] to-[#1E56E0] px-6 py-3 text-[0.9rem] font-semibold shadow-[0_8px_24px_rgba(30,86,224,0.35)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(30,86,224,0.5)]"
-                                                >
-                                                    Start Your Project <ArrowRight size={15} />
-                                                </a>
-                                            </div>
-
-                                            {/* right metrics */}
-                                            <div className="grid gap-4 sm:grid-cols-2">
-                                                {[
-                                                    { icon: Gauge, title: "Speed Optimized", desc: "Sub-2-second load times on every build." },
-                                                    { icon: Search, title: "SEO Ready", desc: "Clean markup and structured data out of the box." },
-                                                    { icon: Smartphone, title: "100% Responsive", desc: "Pixel-perfect on every screen size." },
-                                                    { icon: Lock, title: "Secure by Default", desc: "HTTPS, input sanitization and best practices." },
-                                                ].map((item) => {
-                                                    const Icon = item.icon;
-                                                    return (
-                                                        <div
-                                                            key={item.title}
-                                                            className="group rounded-2xl border border-black/8 bg-[#f1f3f8] p-5 transition-all duration-300 hover:border-[#45CFFF]/25 hover:bg-[#e8ecf4] dark:border-white/[0.07] dark:bg-[#0F1E3D]/50 dark:hover:bg-[#0F1E3D]/80"
-                                                        >
-                                                            <Icon
-                                                                size={22}
-                                                                className="mb-3 text-[#45CFFF] transition-transform duration-300 group-hover:-translate-y-0.5"
-                                                            />
-                                                            <h4 className="font-sora text-[0.95rem] font-bold text-[#1a1f36] dark:text-white">{item.title}</h4>
-                                                            <p className="mt-1 text-[0.8rem] leading-relaxed text-[#8b95ad] dark:text-[#7C8AAD]">{item.desc}</p>
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </section>
-
-                                {/* ============================================================ */}
-                                {/*  CTA BANNER                                                  */}
-                                {/* ============================================================ */}
-                                <section className="relative px-5 pb-20 sm:px-8 md:px-16">
-                                    <div className="mx-auto max-w-7xl">
-                                        <div className="relative overflow-hidden rounded-[28px] border border-black/8 bg-gradient-to-br from-white via-[#f1f3f8] to-[#e8ecf4] p-10 text-center sm:p-14 dark:border-white/[0.09] dark:from-[#0F1E3D] dark:via-[#0B1730] dark:to-[#060B14]">
-                                            <div
-                                                className="pointer-events-none absolute -left-20 -top-20 h-64 w-64 rounded-full opacity-30 blur-3xl"
-                                                style={{ background: "radial-gradient(circle, #45CFFF, transparent 70%)" }}
-                                            />
-                                            <div
-                                                className="pointer-events-none absolute -bottom-20 -right-20 h-64 w-64 rounded-full opacity-20 blur-3xl"
-                                                style={{ background: "radial-gradient(circle, #1E56E0, transparent 70%)" }}
-                                            />
-
-                                            <div className="relative z-10">
-                                                <h2 className="font-sora text-[2rem] font-bold leading-tight text-[#1a1f36] sm:text-[2.5rem] dark:text-white">
-                                                    Ready to build your dream website?
-                                                </h2>
-                                                <p className="mx-auto mt-4 max-w-[48ch] text-[1rem] leading-relaxed text-[#596887] dark:text-[#B9C7E0]">
-                                                    Let's turn your vision into a fast, beautiful and conversion-ready website. Tell us what
-                                                    you need and we'll make it happen.
-                                                </p>
-                                                <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-                                                    <a
-                                                        href="/contact"
-                                                        className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#45CFFF] to-[#1E56E0] px-7 py-3.5 text-[0.95rem] font-semibold text-[#060B14] shadow-[0_10px_30px_rgba(46,139,240,0.35)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_36px_rgba(46,139,240,0.5)]"
-                                                    >
-                                                        Start Your Project <ArrowRight size={16} />
-                                                    </a>
-                                                    <a
-                                                        href="/contact"
-                                                        className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-black/[0.03] px-7 py-3.5 text-[0.95rem] font-semibold transition-all duration-300 hover:bg-black/[0.06] dark:border-white/[0.12] dark:bg-white/[0.03] dark:hover:bg-white/[0.06]"
-                                                    >
-                                                        Talk to Sales
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </section>
                             </div>
-                        );
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* ============================================================ */}
+            {/*  WHY ENTRA                                                   */}
+            {/* ============================================================ */}
+            <section className="relative px-5 py-20 sm:px-8 md:px-16">
+                <div className="mx-auto max-w-7xl">
+                    <div className="grid gap-12 md:grid-cols-2 md:items-center">
+                        {/* left copy */}
+                        <div>
+                            <span className="inline-flex items-center gap-2 font-mono text-[12.5px] uppercase tracking-[0.22em] text-[#45CFFF]">
+                                <span className="inline-block h-px w-7 bg-[#45CFFF]" />
+                                Why Entra
+                            </span>
+                            <h2 className="mt-5 font-sora text-[2rem] font-bold leading-tight text-[#1a1f36] sm:text-[2.5rem] dark:text-white">
+                                We don't just build websites. We build growth engines.
+                            </h2>
+                            <p className="mt-4 text-[1rem] leading-relaxed text-[#596887] dark:text-[#B9C7E0]">
+                                Every site we deliver is optimized for speed, search engines and conversions — so it doesn't
+                                just look great, it actually drives results for your business.
+                            </p>
+                            <a
+                                href="/contact"
+                                className="mt-7 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#2E8BF0] to-[#1E56E0] px-6 py-3 text-[0.9rem] font-semibold shadow-[0_8px_24px_rgba(30,86,224,0.35)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(30,86,224,0.5)]"
+                            >
+                                Start Your Project <ArrowRight size={15} />
+                            </a>
+                        </div>
+
+                        {/* right metrics */}
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            {[
+                                { icon: Gauge, title: "Speed Optimized", desc: "Sub-2-second load times on every build." },
+                                { icon: Search, title: "SEO Ready", desc: "Clean markup and structured data out of the box." },
+                                { icon: Smartphone, title: "100% Responsive", desc: "Pixel-perfect on every screen size." },
+                                { icon: Lock, title: "Secure by Default", desc: "HTTPS, input sanitization and best practices." },
+                            ].map((item) => {
+                                const Icon = item.icon;
+                                return (
+                                    <div
+                                        key={item.title}
+                                        className="group rounded-2xl border border-black/8 bg-[#f1f3f8] p-5 transition-all duration-300 hover:border-[#45CFFF]/25 hover:bg-[#e8ecf4] dark:border-white/[0.07] dark:bg-[#0F1E3D]/50 dark:hover:bg-[#0F1E3D]/80"
+                                    >
+                                        <Icon
+                                            size={22}
+                                            className="mb-3 text-[#45CFFF] transition-transform duration-300 group-hover:-translate-y-0.5"
+                                        />
+                                        <h4 className="font-sora text-[0.95rem] font-bold text-[#1a1f36] dark:text-white">{item.title}</h4>
+                                        <p className="mt-1 text-[0.8rem] leading-relaxed text-[#8b95ad] dark:text-[#7C8AAD]">{item.desc}</p>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* ============================================================ */}
+            {/*  CTA BANNER                                                  */}
+            {/* ============================================================ */}
+            <section className="relative px-5 pb-20 sm:px-8 md:px-16">
+                <div className="mx-auto max-w-7xl">
+                    <div className="relative overflow-hidden rounded-[28px] border border-black/8 bg-gradient-to-br from-white via-[#f1f3f8] to-[#e8ecf4] p-10 text-center sm:p-14 dark:border-white/[0.09] dark:from-[#0F1E3D] dark:via-[#0B1730] dark:to-[#060B14]">
+                        <div
+                            className="pointer-events-none absolute -left-20 -top-20 h-64 w-64 rounded-full opacity-30 blur-3xl"
+                            style={{ background: "radial-gradient(circle, #45CFFF, transparent 70%)" }}
+                        />
+                        <div
+                            className="pointer-events-none absolute -bottom-20 -right-20 h-64 w-64 rounded-full opacity-20 blur-3xl"
+                            style={{ background: "radial-gradient(circle, #1E56E0, transparent 70%)" }}
+                        />
+
+                        <div className="relative z-10">
+                            <h2 className="font-sora text-[2rem] font-bold leading-tight text-[#1a1f36] sm:text-[2.5rem] dark:text-white">
+                                Ready to build your dream website?
+                            </h2>
+                            <p className="mx-auto mt-4 max-w-[48ch] text-[1rem] leading-relaxed text-[#596887] dark:text-[#B9C7E0]">
+                                Let's turn your vision into a fast, beautiful and conversion-ready website. Tell us what
+                                you need and we'll make it happen.
+                            </p>
+                            <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+                                <a
+                                    href="/contact"
+                                    className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#45CFFF] to-[#1E56E0] px-7 py-3.5 text-[0.95rem] font-semibold text-[#060B14] shadow-[0_10px_30px_rgba(46,139,240,0.35)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_36px_rgba(46,139,240,0.5)]"
+                                >
+                                    Start Your Project <ArrowRight size={16} />
+                                </a>
+                                <a
+                                    href="/contact"
+                                    className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-black/[0.03] px-7 py-3.5 text-[0.95rem] font-semibold transition-all duration-300 hover:bg-black/[0.06] dark:border-white/[0.12] dark:bg-white/[0.03] dark:hover:bg-white/[0.06]"
+                                >
+                                    Talk to Sales
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    );
 }

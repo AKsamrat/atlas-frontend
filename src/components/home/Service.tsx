@@ -1,4 +1,5 @@
 import { ArrowRight, CheckCircle2, Code2, Globe2, Palette, Rocket } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useContent, type ServiceData as ServiceDataType } from "../../context/ContentContext";
 
 /**
@@ -29,10 +30,19 @@ interface Service {
     title: string;
     description: string;
     icon: LucideIcon;
+    link: string;
     items: ServiceItem[];
 }
 
 const ICON_MAP: Record<string, LucideIcon> = { Globe2, Code2, Palette, Rocket };
+
+/** Maps service icon names to their corresponding page routes */
+const SERVICE_ROUTES: Record<string, string> = {
+    Globe2: "/domain-hosting",
+    Code2: "/web-development",
+    Palette: "/design/logo-branding",
+    Rocket: "/marketing/facebook",
+};
 
 function mapContextService(s: ServiceDataType): Service {
     const Icon = ICON_MAP[s.iconName] || Globe2;
@@ -42,6 +52,7 @@ function mapContextService(s: ServiceDataType): Service {
         title: s.title,
         description: s.description,
         icon: Icon,
+        link: SERVICE_ROUTES[s.iconName] || "/",
         items: s.items.map((it) => ({ title: it.title, icon: CheckCircle2 })),
     };
 }
@@ -91,13 +102,13 @@ function ServiceCard({ service }: { service: Service }) {
                 })}
             </div>
 
-            <a
-                href="#contact"
+            <Link
+                to={service.link}
                 className="relative z-10 mt-7 inline-flex items-center gap-1.5 rounded-full border border-black/8 bg-black/[0.04] px-4 py-2 font-inter text-[0.85rem] font-semibold text-[#1a1f36] transition-all duration-300 hover:gap-2.5 hover:bg-gradient-to-r hover:from-[#45CFFF] hover:to-[#1E56E0] hover:text-[#060B14] dark:border-white/[0.08] dark:bg-white/[0.05] dark:text-white dark:hover:bg-gradient-to-r dark:hover:from-[#45CFFF] dark:hover:to-[#1E56E0] dark:hover:text-[#060B14]"
             >
                 Get started
                 <ArrowRight size={15} />
-            </a>
+            </Link>
         </div>
     );
 }
