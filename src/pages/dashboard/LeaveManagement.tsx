@@ -1,22 +1,26 @@
 import { useState, useEffect, useCallback } from "react";
+import { useResetPage } from "../../hooks/useResetPage";
 import {
     FaCalendarCheck, FaCalendarTimes, FaCalendarAlt, FaCheckCircle,
     FaTimesCircle, FaClock, FaPlus, FaSearch, FaTimes, FaEye, FaSpinner, FaTrash,
 } from "react-icons/fa";
 import { leavesApi, employeesApi, type LeaveRequestData, type LeaveStats, type EmployeeData } from "../../services";
+import { useNotifications } from "../../context/NotificationContext";
 import Swal from "sweetalert2";
 
 const leaveTypes = ["Sick Leave", "Annual Leave", "Personal Leave", "Maternity Leave", "Paternity Leave"];
 const statusColors: Record<string, string> = { Pending: "bg-amber-500/10 text-amber-600 dark:text-amber-400", Approved: "bg-green-500/10 text-green-600 dark:text-green-400", Rejected: "bg-red-500/10 text-red-600 dark:text-red-400" };
+const fmtDate = (d: string) => d ? new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—";
 
 export default function LeaveManagement() {
+    const { addNotification } = useNotifications();
     const [requests, setRequests] = useState<LeaveRequestData[]>([]);
     const [stats, setStats] = useState<LeaveStats | null>(null);
     const [allEmployees, setAllEmployees] = useState<EmployeeData[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useResetPage([statusFilter, search]);
     const [totalPages, setTotalPages] = useState(1);
     const [total, setTotal] = useState(0);
     const [showModal, setShowModal] = useState(false);
@@ -58,7 +62,6 @@ export default function LeaveManagement() {
     useEffect(() => { fetchRequests(); }, [fetchRequests]);
     useEffect(() => { fetchStats(); }, [fetchStats]);
     useEffect(() => { fetchEmployees(); }, [fetchEmployees]);
-    useEffect(() => { setPage(1); }, [statusFilter, search]);
 
     const resetForm = () => { setFormEmployeeId(""); setFormType(leaveTypes[0]); setFormFrom(""); setFormTo(""); setFormDays(""); setFormReason(""); };
 
@@ -80,6 +83,14 @@ export default function LeaveManagement() {
         if (!result.isConfirmed) return;
         try {
             await leavesApi.update(id, { status: newStatus });
+            const req = requests.find((r) => r.id === id);
+            addNotification({
+                panel: "employee",
+                type: newStatus === "Approved" ? "leave_approved" : "leave_rejected",
+                title: `Leave ${newStatus}`,
+                message: `Your ${req?.type || "leave"} request (${fmtDate(req?.from_date || "")} â€” ${fmtDate(req?.to_date || "")}) has been ${newStatus.toLowerCase()}`,
+                link: "/user/leave",
+            });
             fetchRequests(); fetchStats();
             Swal.fire({ icon: "success", title: `Leave ${newStatus.toLowerCase()}`, timer: 1500, showConfirmButton: false });
         } catch { Swal.fire("Error", "Failed to update status", "error"); }
@@ -115,7 +126,7 @@ export default function LeaveManagement() {
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {balanceCards.map((card) => {
                     const remaining = card.total - card.used;
                     const pct = card.total > 0 ? Math.min((card.used / card.total) * 100, 100) : 0;
@@ -158,28 +169,28 @@ export default function LeaveManagement() {
                         <thead>
                             <tr className="border-b border-[#E2E8F0] dark:border-[#2D3748]">
                                 {["Employee", "Type", "From", "To", "Days", "Status", ""].map((h, i) => (
-                                    <th key={i} className="px-6 py-3 text-left text-xs font-mono uppercase tracking-wider text-[#718096] dark:text-[#A0AEC0]">{h}</th>
+                                    <th key={i} className="px-3 sm:px-6 py-3 text-left text-xs font-mono uppercase tracking-wider text-[#718096] dark:text-[#A0AEC0]">{h}</th>
                                 ))}
                             </tr>
                         </thead>
                         <tbody>
                             {loading ? (
-                                <tr><td colSpan={7} className="px-6 py-12 text-center text-[#A0AEC0]"><FaSpinner className="mx-auto animate-spin" size={20} /></td></tr>
+                                <tr><td colSpan={7} className="px-3 sm:px-6 py-12 text-center text-[#A0AEC0]"><FaSpinner className="mx-auto animate-spin" size={20} /></td></tr>
                             ) : requests.length === 0 ? (
-                                <tr><td colSpan={7} className="px-6 py-12 text-center text-sm text-[#A0AEC0]">No leave requests found.</td></tr>
+                                <tr><td colSpan={7} className="px-3 sm:px-6 py-12 text-center text-sm text-[#A0AEC0]">No leave requests found.</td></tr>
                             ) : requests.map((req) => (
                                 <tr key={req.id} className="border-b border-[#E2E8F0]/50 dark:border-[#2D3748]/50 hover:bg-[#F9FAFC] dark:hover:bg-white/[0.02] transition-colors">
-                                    <td className="px-6 py-3.5">
+                                    <td className="px-3 sm:px-6 py-3">
                                         <div className="flex items-center gap-3">
                                             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#45CFFF] to-[#1E56E0] flex items-center justify-center text-white text-xs font-bold">{req.employee?.name?.charAt(0) || "?"}</div>
                                             <div><p className="text-sm font-medium text-[#1a1f36] dark:text-white">{req.employee?.name || "Unknown"}</p><p className="text-xs text-[#718096] dark:text-[#A0AEC0]">{req.employee?.department || ""}</p></div>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-3.5 text-sm text-[#1a1f36] dark:text-white">{req.type}</td>
-                                    <td className="px-6 py-3.5 text-sm text-[#718096] dark:text-[#A0AEC0]">{new Date(req.from_date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</td>
-                                    <td className="px-6 py-3.5 text-sm text-[#718096] dark:text-[#A0AEC0]">{new Date(req.to_date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</td>
-                                    <td className="px-6 py-3.5 text-sm font-mono font-bold text-[#1a1f36] dark:text-white">{req.days}</td>
-                                    <td className="px-6 py-3.5">
+                                    <td className="px-3 sm:px-6 py-3 text-sm text-[#1a1f36] dark:text-white">{req.type}</td>
+                                    <td className="px-3 sm:px-6 py-3 text-sm text-[#718096] dark:text-[#A0AEC0]">{new Date(req.from_date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</td>
+                                    <td className="px-3 sm:px-6 py-3 text-sm text-[#718096] dark:text-[#A0AEC0]">{new Date(req.to_date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</td>
+                                    <td className="px-3 sm:px-6 py-3 text-sm font-mono font-bold text-[#1a1f36] dark:text-white">{req.days}</td>
+                                    <td className="px-3 sm:px-6 py-3">
                                         <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${statusColors[req.status] || ""}`}>
                                             {req.status === "Approved" && <FaCheckCircle size={10} className="inline mr-1" />}
                                             {req.status === "Rejected" && <FaTimesCircle size={10} className="inline mr-1" />}
@@ -187,7 +198,7 @@ export default function LeaveManagement() {
                                             {req.status}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-3.5">
+                                    <td className="px-3 sm:px-6 py-3">
                                         <div className="flex items-center gap-1">
                                             <button onClick={() => setViewRequest(req)} className="px-2 py-1 rounded-lg bg-blue-500/10 text-blue-500 text-xs hover:bg-blue-500/20 transition-colors" title="View"><FaEye size={12} /></button>
                                             {req.status === "Pending" && (
@@ -265,7 +276,7 @@ export default function LeaveManagement() {
                                     {leaveTypes.map((t) => <option key={t}>{t}</option>)}
                                 </select>
                             </div>
-                            <div className="grid grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-[#1a1f36] dark:text-white mb-1.5">From *</label>
                                     <input type="date" value={formFrom} onChange={(e) => setFormFrom(e.target.value)}

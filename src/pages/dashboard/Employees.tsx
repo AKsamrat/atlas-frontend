@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useResetPage } from "../../hooks/useResetPage";
 import {
     FaSearch, FaPlus, FaEdit, FaTrash, FaEye, FaEnvelope, FaPhone,
     FaSpinner, FaBuilding, FaDollarSign, FaUserCheck, FaCalendarTimes, FaCamera,
@@ -19,7 +20,7 @@ export default function Employees() {
     const [search, setSearch] = useState("");
     const [deptFilter, setDeptFilter] = useState("All");
     const [statusFilter, setStatusFilter] = useState("all");
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useResetPage([deptFilter, statusFilter, search]);
     const [totalPages, setTotalPages] = useState(1);
     const [total, setTotal] = useState(0);
     const [showModal, setShowModal] = useState(false);
@@ -66,7 +67,6 @@ export default function Employees() {
 
     useEffect(() => { fetchEmployees(); }, [fetchEmployees]);
     useEffect(() => { fetchStats(); }, [fetchStats]);
-    useEffect(() => { setPage(1); }, [deptFilter, statusFilter, search]);
 
     const resetForm = () => { setFormName(""); setFormEmail(""); setFormPassword(""); setFormPhone(""); setFormDept("Development"); setFormRole(""); setFormSalary(""); setFormStatus("active"); setFormJoinDate(""); setFormAddress(""); setFormEmergency(""); setFormImage(null); setFormImagePreview(""); setEditing(null); };
 

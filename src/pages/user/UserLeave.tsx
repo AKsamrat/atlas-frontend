@@ -4,6 +4,8 @@ import {
     FaHistory, FaPaperPlane, FaEye, FaSpinner,
 } from "react-icons/fa";
 import { userApi, type MyLeaveRequest } from "../../services";
+import { useNotifications } from "../../context/NotificationContext";
+import { useAuth } from "../../context/AuthContext";
 import Swal from "sweetalert2";
 
 type ViewMode = "history" | "apply";
@@ -22,6 +24,8 @@ const fmtDate = (d: string) => {
 };
 
 export default function UserLeave() {
+    const { addNotification } = useNotifications();
+    const { user } = useAuth();
     const [view, setView] = useState<ViewMode>("history");
     const [requests, setRequests] = useState<MyLeaveRequest[]>([]);
     const [loading, setLoading] = useState(true);
@@ -79,6 +83,13 @@ export default function UserLeave() {
                 reason,
             });
             setStartDate(""); setEndDate(""); setReason("");
+            addNotification({
+                panel: "admin",
+                type: "leave_requested",
+                title: "New Leave Request",
+                message: `${user?.name || "Employee"} requested ${leaveType} from ${startDate} to ${endDate}`,
+                link: "/dashboard/leave",
+            });
             Swal.fire({ icon: "success", title: "Leave Request Submitted!", timer: 2000, showConfirmButton: false });
             setView("history");
             fetchLeaves();

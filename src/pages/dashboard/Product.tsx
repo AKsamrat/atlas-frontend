@@ -1,6 +1,7 @@
 
 
 import { useState, useEffect, useCallback } from "react";
+import { useResetPage } from "../../hooks/useResetPage";
 import { FaSearch, FaPlus, FaEdit, FaTrash, FaBoxOpen, FaCheckCircle, FaTimesCircle, FaExclamationTriangle, FaSpinner, FaTimes } from "react-icons/fa";
 import { productsApi, type ProductData, type ProductStats } from "../../services";
 import Swal from "sweetalert2";
@@ -20,7 +21,7 @@ export default function Product() {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
     const [catFilter, setCatFilter] = useState("All");
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useResetPage([catFilter, search]);
     const [totalPages, setTotalPages] = useState(1);
     const [total, setTotal] = useState(0);
     const [showModal, setShowModal] = useState(false);
@@ -47,7 +48,6 @@ export default function Product() {
 
     useEffect(() => { fetchProducts(); }, [fetchProducts]);
     useEffect(() => { fetchStats(); }, [fetchStats]);
-    useEffect(() => { setPage(1); }, [catFilter, search]);
 
     const resetForm = () => { setForm({ name: "", description: "", category: "Services", price: "", stock: "", min_stock: "10", status: "active", supplier: "" }); setEditingProduct(null); };
 
@@ -113,7 +113,7 @@ export default function Product() {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                 {summaryCards.map((stat) => (
                     <div key={stat.label} className="rounded-2xl bg-white dark:bg-[#0F1E3D] border border-[#E2E8F0] dark:border-[#2D3748] p-4 flex items-center gap-3">
                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${stat.color}`}><stat.icon size={18} /></div>
@@ -132,7 +132,7 @@ export default function Product() {
                     <input type="text" placeholder="Search products..." value={search} onChange={(e) => setSearch(e.target.value)}
                         className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-[#0F1E3D] border border-[#E2E8F0] dark:border-[#2D3748] text-sm text-[#1a1f36] dark:text-white placeholder-[#A0AEC0] focus:outline-none focus:ring-2 focus:ring-[#45CFFF]" />
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                     {CATEGORIES.map((c) => (
                         <button key={c} onClick={() => setCatFilter(c)}
                             className={`px-3 py-2 rounded-lg text-xs font-medium transition-all ${catFilter === c ? "bg-[#45CFFF] text-white" : "bg-white dark:bg-[#0F1E3D] border border-[#E2E8F0] dark:border-[#2D3748] text-[#718096] dark:text-[#A0AEC0] hover:border-[#45CFFF]/50"}`}>
@@ -231,7 +231,7 @@ export default function Product() {
                                     <input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-[#F9FAFC] dark:bg-[#060B14] border border-[#E2E8F0] dark:border-[#2D3748] text-sm text-[#1a1f36] dark:text-white focus:ring-2 focus:ring-[#45CFFF] focus:outline-none" />
                                 </div>
                             </div>
-                            <div className="grid grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                 <div>
                                     <label className="block text-xs font-medium text-[#718096] dark:text-[#A0AEC0] mb-1">Stock</label>
                                     <input type="number" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-[#F9FAFC] dark:bg-[#060B14] border border-[#E2E8F0] dark:border-[#2D3748] text-sm text-[#1a1f36] dark:text-white focus:ring-2 focus:ring-[#45CFFF] focus:outline-none" />

@@ -253,9 +253,9 @@ export default function Navbar() {
              bg-gradient-to-br from-[#172344] to-[#3277dd]
              [clip-path:polygon(0_0,100%_0,74%_100%,0_100%)]"
             />
-            <nav ref={navRef} className="relative z-10 mx-auto flex w-full max-w-7xl items-center justify-between  py-3">
+            <nav ref={navRef} className="relative z-10 mx-auto flex w-full max-w-7xl items-center justify-between  py-2">
                 {/* Logo */}
-                <a href="/" className="relative flex-shrink-0">
+                <a href="/" className="relative flex-shrink-0 rounded-md bg-gray-100 px-2 py-0.5 dark:bg-white/80 md:bg-transparent md:dark:bg-transparent">
                     <img src={logo} alt="Entra Global Tech logo" className="h-9 w-auto md:h-14" />
                 </a>
 
@@ -343,7 +343,7 @@ export default function Navbar() {
                                 getAvatarUrl(user.avatar) ? (
                                     <img src={getAvatarUrl(user.avatar)!} alt={user.name} className="w-full h-full rounded-full object-cover" />
                                 ) : (
-                                    <span className="text-sm font-bold font-sora">{user.name.charAt(0).toUpperCase()}</span>
+                                    <span className="text-sm font-bold font-sora">{(user.name || "?").charAt(0).toUpperCase()}</span>
                                 )
                             ) : (
                                 <User size={19} />
@@ -362,7 +362,7 @@ export default function Navbar() {
                                                     {getAvatarUrl(user.avatar) ? (
                                                         <img src={getAvatarUrl(user.avatar)!} alt={user.name} className="w-full h-full object-cover" />
                                                     ) : (
-                                                        user.name.charAt(0).toUpperCase()
+                                                        (user.name || "?").charAt(0).toUpperCase()
                                                     )}
                                                 </div>
                                                 <div className="min-w-0">
@@ -496,7 +496,7 @@ export default function Navbar() {
                         <div className="space-y-2">
                             <div className="flex items-center gap-3 mb-2">
                                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#45CFFF] to-[#1E56E0] text-white">
-                                    <span className="text-sm font-bold font-sora">{user.name.charAt(0).toUpperCase()}</span>
+                                    <span className="text-sm font-bold font-sora">{(user.name || "?").charAt(0).toUpperCase()}</span>
                                 </div>
                                 <div>
                                     <p className="text-sm font-semibold text-gray-900 dark:text-white">{user.name}</p>

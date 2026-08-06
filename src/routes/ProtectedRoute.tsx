@@ -10,7 +10,6 @@ interface ProtectedRouteProps {
 
 const ROLE_HOME: Record<AllowedRoles, string> = {
     admin: "/dashboard",
-    employee: "/user",
     user: "/user",
     customer: "/customer",
 };

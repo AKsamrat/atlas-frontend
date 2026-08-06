@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Camera, Save, User, Mail, Shield, Loader2, CheckCircle2, AlertCircle, X, ImageOff } from "lucide-react";
+import { Camera, Save, User, Mail, Shield, Loader2, CheckCircle2, AlertCircle, X } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { authApi } from "../../services";
 
@@ -192,7 +192,7 @@ export default function Settings() {
                                 />
                             ) : (
                                 <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-[#45CFFF] to-[#1E56E0] text-white text-3xl font-bold shadow-[0_4px_20px_rgba(69,207,255,0.3)]">
-                                    {user?.name?.[0]?.toUpperCase() || "A"}
+                                    {user?.name ? (user.name || "A").charAt(0).toUpperCase() : "A"}
                                 </div>
                             )}
 

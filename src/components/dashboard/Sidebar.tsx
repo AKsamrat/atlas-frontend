@@ -13,6 +13,7 @@ import {
     Globe,
     X,
     Home,
+    Bell,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import entraLogo from "../../assets/entra-logo.png";
@@ -43,6 +44,7 @@ const sidebarRoutes = [
         icon: ShoppingCart,
         children: [
             { name: "Products", path: "/dashboard/products" },
+            { name: "POS (Manual Order)", path: "/dashboard/pos" },
             { name: "Orders", path: "/dashboard/orders" },
             { name: "Customers", path: "/dashboard/customers" },
             { name: "Inventory", path: "/dashboard/inventory" },
@@ -74,6 +76,7 @@ const sidebarRoutes = [
 
 const bottomRoutes = [
     { name: "Home", path: "/", icon: Home },
+    { name: "Notifications", path: "/dashboard/notifications", icon: Bell },
     { name: "Settings", path: "/dashboard/settings", icon: Settings },
 ];
 
@@ -123,7 +126,7 @@ const Sidebar = () => {
     return (
         <>
             {/* ── Mobile Top Bar ──────────────────────────────────── */}
-            <div className="md:hidden flex items-center justify-between px-4 py-3 bg-[#060B14] text-white border-b border-white/[0.06]">
+            <div className="md:hidden relative z-50 flex items-center justify-between px-4 py-3 bg-[#060B14] text-white border-b border-white/[0.06]">
                 <div className="flex items-center gap-3">
                     <div className="flex items-center justify-center rounded-lg bg-white p-1">
                         <img src={entraLogo} alt="Entra" className="h-7 w-auto" />

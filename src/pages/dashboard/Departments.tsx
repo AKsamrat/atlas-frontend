@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useResetPage } from "../../hooks/useResetPage";
 import {
     FaBuilding, FaUsers, FaDollarSign, FaPlus, FaEdit, FaTrash, FaSpinner, FaChartBar, FaProjectDiagram,
 } from "react-icons/fa";
@@ -13,7 +14,7 @@ export default function Departments() {
     const [stats, setStats] = useState<DepartmentStats | null>(null);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useResetPage([search]);
     const [totalPages, setTotalPages] = useState(1);
     const [total, setTotal] = useState(0);
     const [showModal, setShowModal] = useState(false);
@@ -51,7 +52,6 @@ export default function Departments() {
 
     useEffect(() => { fetchDepartments(); }, [fetchDepartments]);
     useEffect(() => { fetchStats(); }, [fetchStats]);
-    useEffect(() => { setPage(1); }, [search]);
 
     const resetForm = () => { setFormName(""); setFormHead(""); setFormMembers("0"); setFormBudget("0"); setFormSpent("0"); setFormPerformance("0"); setFormProjects("0"); setFormColor(deptColors[0]); setEditing(null); };
 

@@ -132,3 +132,10 @@ export {
   type CreateUserPayload,
   type PaginatedUsers,
 } from "./Users";
+export {
+  notificationsApi,
+  type AppNotification,
+  type NotificationPanel,
+  type NotificationType,
+  type CreateNotificationPayload,
+} from "./Notification";

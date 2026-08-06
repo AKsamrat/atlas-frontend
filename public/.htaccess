@@ -1,0 +1,23 @@
+# ─────────────────────────────────────────────────────────────
+# Entra Global Tech — Frontend .htaccess (shared hosting)
+# Place this in the root of your hosting where dist/ files are uploaded
+# ─────────────────────────────────────────────────────────────
+
+RewriteEngine On
+
+# IMPORTANT: Pass Authorization header to PHP (Apache strips it by default)
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+# 1. API proxy → backend (avoids CORS)
+# ── Option A: PHP proxy (works on ALL shared hosting) ──
+RewriteRule ^api/(.*)$ api-proxy.php/$1 [L,QSA]
+
+# ── Option B: If mod_proxy is enabled, use this instead (faster) ──
+# Uncomment the 2 lines below AND comment out the PHP proxy line above
+# RewriteCond %{HTTP_HOST} ^(www\.)?entraglobaltech\.com$ [NC]
+# RewriteRule ^api/(.*)$ https://admin.entraglobaltech.com/api/$1 [P,L]
+
+# 2. SPA fallback — serve index.html for all non-file routes
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.html [L]

@@ -22,10 +22,21 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
+      // Always clear stale tokens
       localStorage.removeItem("entra-auth-token");
       localStorage.removeItem("entra-auth-user");
-      // Only redirect if not already on login
-      if (!window.location.pathname.includes("/login")) {
+
+      // Only redirect if the user is currently on a protected route
+      // (dashboard, user, or customer panels). Public pages like the
+      // landing page, services, and cart should never redirect — the
+      // AuthProvider handles setting user=null on its own.
+      const path = window.location.pathname;
+      const isProtectedRoute =
+        path.startsWith("/dashboard") ||
+        path.startsWith("/user") ||
+        path.startsWith("/customer");
+
+      if (isProtectedRoute && !path.includes("/login")) {
         window.location.href = "/login";
       }
     }

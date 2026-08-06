@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useResetPage } from "../../hooks/useResetPage";
 import { FaSearch, FaEnvelope, FaPhone, FaUsers, FaShoppingCart, FaDollarSign, FaUserPlus, FaMapMarkerAlt, FaSpinner, FaTimes, FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import { customersApi, type CustomerData, type CustomerStats } from "../../services";
 import Swal from "sweetalert2";
@@ -15,7 +16,7 @@ export default function Customers() {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useResetPage([statusFilter, search]);
     const [totalPages, setTotalPages] = useState(1);
     const [total, setTotal] = useState(0);
     const [showModal, setShowModal] = useState(false);
@@ -42,7 +43,6 @@ export default function Customers() {
 
     useEffect(() => { fetchCustomers(); }, [fetchCustomers]);
     useEffect(() => { fetchStats(); }, [fetchStats]);
-    useEffect(() => { setPage(1); }, [statusFilter, search]);
 
     const resetForm = () => { setForm({ name: "", email: "", phone: "", location: "", status: "active", notes: "" }); setEditingCustomer(null); };
 
@@ -107,7 +107,7 @@ export default function Customers() {
             </div>
 
             {/* Summary */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                 {summaryCards.map((stat) => (
                     <div key={stat.label} className="rounded-2xl bg-white dark:bg-[#0F1E3D] border border-[#E2E8F0] dark:border-[#2D3748] p-4 flex items-center gap-3">
                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${stat.color}`}><stat.icon size={18} /></div>
@@ -126,7 +126,7 @@ export default function Customers() {
                     <input type="text" placeholder="Search customers..." value={search} onChange={(e) => setSearch(e.target.value)}
                         className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-[#0F1E3D] border border-[#E2E8F0] dark:border-[#2D3748] text-sm text-[#1a1f36] dark:text-white placeholder-[#A0AEC0] focus:outline-none focus:ring-2 focus:ring-[#45CFFF]" />
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                     {["all", "active", "vip", "inactive"].map((s) => (
                         <button key={s} onClick={() => setStatusFilter(s)}
                             className={`px-3 py-2 rounded-lg text-xs font-medium capitalize transition-all ${statusFilter === s ? "bg-[#45CFFF] text-white" : "bg-white dark:bg-[#0F1E3D] border border-[#E2E8F0] dark:border-[#2D3748] text-[#718096] dark:text-[#A0AEC0] hover:border-[#45CFFF]/50"}`}>

@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { useResetPage } from "../../hooks/useResetPage";
 import {
     FaSearch, FaPlus, FaReceipt, FaCalendar, FaChartPie,
     FaTimes, FaCheckCircle, FaTrash, FaSpinner, FaEdit,
 } from "react-icons/fa";
 import { expensesApi, type ExpenseData, type ExpenseStats } from "../../services";
+import { useNotifications } from "../../context/NotificationContext";
 import Swal from "sweetalert2";
 
 const categories = ["Rent", "Utilities", "Software", "Marketing", "Supplies", "Travel", "Office", "Miscellaneous"];
@@ -27,9 +29,10 @@ export default function Expenses() {
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
     const [categoryFilter, setCategoryFilter] = useState("all");
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useResetPage([statusFilter, categoryFilter, search]);
     const [totalPages, setTotalPages] = useState(1);
     const [total, setTotal] = useState(0);
+    const { addNotification } = useNotifications();
     const [showModal, setShowModal] = useState(false);
     const [editingExpense, setEditingExpense] = useState<ExpenseData | null>(null);
 
@@ -64,7 +67,6 @@ export default function Expenses() {
 
     useEffect(() => { fetchExpenses(); }, [fetchExpenses]);
     useEffect(() => { fetchStats(); }, [fetchStats]);
-    useEffect(() => { setPage(1); }, [statusFilter, categoryFilter, search]);
 
     const categoryBreakdown = useMemo(() => {
         // Build from stats or local data — using local for breakdown bars
@@ -90,9 +92,11 @@ export default function Expenses() {
             const payload = { description: formDesc, category: formCategory, amount: Number(formAmount), payment_method: formMethod, submitted_by: formSubmitter, date: new Date().toISOString().split("T")[0] };
             if (editingExpense) {
                 await expensesApi.update(editingExpense.id, payload);
+                addNotification({ type: "expense_created", title: "Expense Updated", message: `${formCategory} expense updated — ${fmt(Number(formAmount))}`, panel: "admin", link: "/dashboard/expenses" });
                 Swal.fire({ icon: "success", title: "Updated", timer: 1500, showConfirmButton: false });
             } else {
                 await expensesApi.create(payload);
+                addNotification({ type: "expense_created", title: "New Expense Submitted", message: `${formCategory}: ${formDesc} — ${fmt(Number(formAmount))}`, panel: "admin", link: "/dashboard/expenses" });
                 Swal.fire({ icon: "success", title: "Submitted", timer: 1500, showConfirmButton: false });
             }
             setShowModal(false); resetForm();
@@ -106,6 +110,9 @@ export default function Expenses() {
     const handleStatusChange = async (id: number, status: "Approved" | "Rejected") => {
         try {
             await expensesApi.update(id, { status });
+            const exp = expenses.find((e) => e.id === id);
+            const type = status === "Approved" ? "expense_approved" : "expense_rejected";
+            addNotification({ type, title: `Expense ${status}`, message: `${exp?.category || "Expense"}: ${exp?.description || ""} — ${fmt(exp?.amount || 0)}`, panel: "admin", link: "/dashboard/expenses" });
             fetchExpenses(); fetchStats();
             Swal.fire({ icon: "success", title: `Expense ${status.toLowerCase()}`, timer: 1500, showConfirmButton: false });
         } catch { Swal.fire("Error", "Failed to update status", "error"); }
@@ -142,7 +149,7 @@ export default function Expenses() {
             </div>
 
             {/* Summary Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                 {summaryCards.map((card) => (
                     <div key={card.label} className="rounded-2xl bg-white dark:bg-[#0F1E3D] border border-[#E2E8F0] dark:border-[#2D3748] p-4 hover:shadow-lg transition-all group">
                         <div className="flex items-center gap-3">

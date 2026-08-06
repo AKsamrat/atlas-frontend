@@ -1,10 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import {
     FaShoppingBag, FaFilter, FaSearch, FaTimes, FaSpinner,
-    FaChevronLeft, FaChevronRight, FaCalendar,
+    FaChevronLeft, FaChevronRight, FaCalendar, FaFileInvoice,
 } from "react-icons/fa";
 import { customerPanelApi, type CustomerPanelOrder } from "../../services";
 
+/** Strip non-numeric chars (currency symbols, commas) before parsing */
+const safeNum = (v: unknown) => parseFloat(String(v).replace(/[^0-9.]/g, "")) || 0;
 const fmt = (n: number) =>
     new Intl.NumberFormat("en-BD", { style: "currency", currency: "BDT", maximumFractionDigits: 0 }).format(n);
 
@@ -21,6 +24,7 @@ const statusColors: Record<string, string> = {
 };
 
 export default function CustomerOrders() {
+    const navigate = useNavigate();
     const [orders, setOrders] = useState<CustomerPanelOrder[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
@@ -230,9 +234,9 @@ export default function CustomerOrders() {
                                             <div key={item.id} className="flex items-center justify-between rounded-xl border border-[#e2e8f0] p-3 dark:border-white/6">
                                                 <div>
                                                     <p className="text-sm font-medium text-[#1a1f36] dark:text-white">{item.name || `Item #${item.id}`}</p>
-                                                    <p className="text-xs text-[#718096]">Qty: {item.quantity} × {fmt(Number(item.price))}</p>
+                                                    <p className="text-xs text-[#718096]">Qty: {item.quantity} × {fmt(safeNum(item.price))}</p>
                                                 </div>
-                                                <span className="text-sm font-semibold text-[#1a1f36] dark:text-white">{fmt(Number(item.price) * item.quantity)}</span>
+                                                <span className="text-sm font-semibold text-[#1a1f36] dark:text-white">{fmt(safeNum(item.price) * item.quantity)}</span>
                                             </div>
                                         ))}
                                     </div>
@@ -240,6 +244,16 @@ export default function CustomerOrders() {
                             </div>
                         ) : (
                             <p className="text-center text-sm text-[#718096]">Order not found</p>
+                        )}
+                        {selectedOrder && (
+                            <div className="mt-5">
+                                <button
+                                    onClick={() => navigate(`/invoice/${selectedOrder.id}`)}
+                                    className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#1E56E0] to-[#2E8BF0] px-5 py-2.5 text-sm font-medium text-white shadow hover:shadow-lg transition-all"
+                                >
+                                    <FaFileInvoice size={14} /> Create Invoice
+                                </button>
+                            </div>
                         )}
                     </div>
                 </div>

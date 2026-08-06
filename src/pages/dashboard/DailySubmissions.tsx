@@ -1,4 +1,5 @@
-﻿import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useResetPage } from "../../hooks/useResetPage";
 import {
     FaClipboardList, FaCheckCircle, FaClock, FaTimes, FaEye,
     FaSave, FaSpinner, FaSearch, FaCalendarAlt, FaUser,
@@ -9,6 +10,7 @@ import {
     type DailySubmissionData,
     type DailySubmissionStats,
 } from "../../services";
+import { useNotifications } from "../../context/NotificationContext";
 import Pagination from "../../components/shared/Pagination";
 import DateRangePicker from "../../components/shared/DateRangePicker";
 import Swal from "sweetalert2";
@@ -30,16 +32,17 @@ const fmtDate = (d: string) => {
 };
 
 export default function DailySubmissions() {
+    const { addNotification } = useNotifications();
     const [submissions, setSubmissions] = useState<DailySubmissionData[]>([]);
     const [stats, setStats] = useState<DailySubmissionStats>({ total: 0, pending: 0, approved: 0, rejected: 0 });
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState("All");
     const [searchTerm, setSearchTerm] = useState("");
-    const [page, setPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const [total, setTotal] = useState(0);
     const [fromDate, setFromDate] = useState("");
     const [toDate, setToDate] = useState("");
+    const [page, setPage] = useResetPage([filter, searchTerm, fromDate, toDate]);
+    const [totalPages, setTotalPages] = useState(1);
+    const [total, setTotal] = useState(0);
     const [showReview, setShowReview] = useState<DailySubmissionData | null>(null);
     const [reviewAccept, setReviewAccept] = useState(0);
     const [reviewReject, setReviewReject] = useState(0);
@@ -75,8 +78,6 @@ export default function DailySubmissions() {
 
     useEffect(() => { fetchData(); }, [fetchData]);
 
-    useEffect(() => { setPage(1); }, [filter, searchTerm, fromDate, toDate]);
-
     const openReview = (s: DailySubmissionData) => {
         setShowReview(s);
         setReviewAccept(s.accept);
@@ -94,6 +95,13 @@ export default function DailySubmissions() {
                 reject: reviewReject,
                 remark: reviewRemark,
                 status: reviewStatus,
+            });
+            addNotification({
+                panel: "employee",
+                type: reviewStatus === "Approved" ? "info" : "info",
+                title: `Submission ${reviewStatus}`,
+                message: `Your daily submission "${showReview.topic}" has been ${reviewStatus.toLowerCase()}${reviewRemark ? ": " + reviewRemark : ""}`,
+                link: "/user/daily-submission",
             });
             Swal.fire({
                 icon: "success",
@@ -193,7 +201,7 @@ export default function DailySubmissions() {
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         placeholder="Search topic, employee..."
-                        className="pl-9 pr-4 py-2 rounded-xl bg-white dark:bg-[#0F1E3D] border border-[#E2E8F0] dark:border-[#2D3748] text-sm text-[#1a1f36] dark:text-white placeholder-[#A0AEC0] focus:outline-none focus:ring-2 focus:ring-[#45CFFF] w-64"
+                        className="pl-9 pr-4 py-2 rounded-xl bg-white dark:bg-[#0F1E3D] border border-[#E2E8F0] dark:border-[#2D3748] text-sm text-[#1a1f36] dark:text-white placeholder-[#A0AEC0] focus:outline-none focus:ring-2 focus:ring-[#45CFFF] w-full sm:w-64"
                     />
                 </div>
                 <DateRangePicker
@@ -225,7 +233,7 @@ export default function DailySubmissions() {
                         <tbody>
                             {filtered.map((s) => (
                                 <tr key={s.id} className="border-b border-[#E2E8F0]/50 dark:border-[#2D3748]/50 hover:bg-[#F9FAFC] dark:hover:bg-white/[0.02] transition-colors">
-                                    <td className="px-5 py-3">
+                                    <td className="px-3 sm:px-5 py-3">
                                         <div className="flex items-center gap-2">
                                             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#1E56E0] to-[#45CFFF] flex items-center justify-center text-white text-xs font-bold">
                                                 {s.employee?.name?.charAt(0) || "U"}

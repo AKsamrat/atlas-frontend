@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useResetPage } from "../../hooks/useResetPage";
 import {
     FaSearch, FaPlus, FaWallet, FaArrowUp, FaArrowDown, FaExchangeAlt,
     FaEye, FaTimes, FaCreditCard, FaBuilding, FaMobileAlt,
@@ -37,7 +38,7 @@ export default function Accounts() {
     const [txLoading, setTxLoading] = useState(true);
     const [txTypeFilter, setTxTypeFilter] = useState("All");
     const [txSearch, setTxSearch] = useState("");
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useResetPage([txTypeFilter, txSearch]);
     const [totalPages, setTotalPages] = useState(1);
     const [total, setTotal] = useState(0);
     const [showDetail, setShowDetail] = useState<TransactionData | null>(null);
@@ -91,7 +92,6 @@ export default function Accounts() {
     useEffect(() => { fetchAccounts(); }, [fetchAccounts]);
     useEffect(() => { fetchTransactions(); }, [fetchTransactions]);
     useEffect(() => { fetchStats(); }, [fetchStats]);
-    useEffect(() => { setPage(1); }, [txTypeFilter, txSearch]);
 
     const resetAccForm = () => { setAccName(""); setAccType("Bank"); setAccBalance(""); setAccNotes(""); setEditingAccount(null); };
 
@@ -168,7 +168,7 @@ export default function Accounts() {
                     <h2 className="font-sora text-xl font-bold text-[#1a1f36] dark:text-white">Accounts & Finance</h2>
                     <p className="text-sm text-[#718096] dark:text-[#A0AEC0]">Manage accounts, track income & expenses</p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3">
                     <button onClick={() => { setTxDesc(""); setTxAmount(""); setTxAccountId(0); setShowAddTx(true); }}
                         className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white dark:bg-[#0F1E3D] border border-[#E2E8F0] dark:border-[#2D3748] text-sm font-medium text-[#1a1f36] dark:text-white hover:border-[#45CFFF]/50 transition-colors">
                         <FaExchangeAlt size={14} />Add Transaction
@@ -181,7 +181,7 @@ export default function Accounts() {
             </div>
 
             {/* Summary Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                 {summaryCards.map((card) => (
                     <div key={card.label} className="rounded-2xl bg-white dark:bg-[#0F1E3D] border border-[#E2E8F0] dark:border-[#2D3748] p-5 hover:shadow-lg transition-all group">
                         <div className="flex items-start justify-between">

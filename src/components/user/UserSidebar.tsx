@@ -12,6 +12,7 @@ import {
     FaBars,
     FaChevronDown,
     FaSignOutAlt,
+    FaBell,
 } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
 import entraLogo from "../../assets/entra-logo.png";
@@ -51,6 +52,11 @@ const userRoutes: Array<{ name: string; path?: string; icon: React.ReactNode; ch
         name: "Daily Submission",
         path: "/user/daily-submission",
         icon: <FaClipboardList />,
+    },
+    {
+        name: "Notifications",
+        path: "/user/notifications",
+        icon: <FaBell />,
     },
 ];
 

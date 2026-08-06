@@ -147,7 +147,7 @@ export default function BoostedPostCampaigns() {
                                     {/* Arrow pointing to timeline */}
                                     <div className={`absolute top-4 ${index % 2 === 0 ? '-right-4' : '-left-4'} w-4 h-4 bg-white dark:bg-[#0F1E3D] border border-[#E2E8F0] dark:border-[#2D3748] rotate-45 group-hover:border-[#1E56E0] transition-colors`} />
 
-                                    <div className="flex items-start gap-4">
+                                    <div className="flex flex-col md:flex-row items-start gap-4">
                                         <div className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-[#1E56E0] dark:text-[#45CFFF] bg-[#1E56E0]/10 dark:bg-[#1E56E0]/20">
                                             <Target size={20} />
                                         </div>

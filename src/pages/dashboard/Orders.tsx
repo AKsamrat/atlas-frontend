@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
+import { useResetPage } from "../../hooks/useResetPage";
+import { useNavigate } from "react-router-dom";
 import {
     FaSearch,
     FaEye,
@@ -8,13 +10,18 @@ import {
     FaCheckCircle,
     FaTimes,
     FaSpinner,
+    FaFileInvoice,
 } from "react-icons/fa";
 import { ordersApi, type OrderData, type OrderStats } from "../../services";
+import { useNotifications } from "../../context/NotificationContext";
 import Swal from "sweetalert2";
 
 /* ------------------------------------------------------------------ */
 /*  Admin Orders Management Page — Connected to backend API            */
 /* ------------------------------------------------------------------ */
+
+/** Strip non-numeric chars (currency symbols, commas) before parsing */
+const safeNum = (v: unknown) => parseFloat(String(v).replace(/[^0-9.]/g, "")) || 0;
 
 const STATUS_COLORS: Record<string, string> = {
     pending: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
@@ -33,14 +40,16 @@ const STATUS_OPTIONS = ["pending", "processing", "completed", "cancelled"] as co
 const PAYMENT_OPTIONS = ["unpaid", "paid", "refunded"] as const;
 
 export default function Orders() {
+    const navigate = useNavigate();
     const [orders, setOrders] = useState<OrderData[]>([]);
     const [stats, setStats] = useState<OrderStats | null>(null);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useResetPage([statusFilter, search]);
     const [totalPages, setTotalPages] = useState(1);
     const [total, setTotal] = useState(0);
+    const { addNotification } = useNotifications();
     const [selectedOrder, setSelectedOrder] = useState<OrderData | null>(null);
     const [updating, setUpdating] = useState(false);
 
@@ -48,6 +57,10 @@ export default function Orders() {
         try {
             setLoading(true);
             const res = await ordersApi.getAll({ status: statusFilter, search, page, per_page: 10 });
+            if (res?.data) {
+
+                setLoading(false);
+            }
             setOrders(res.data.data);
             setTotalPages(res.data.last_page);
             setTotal(res.data.total);
@@ -67,7 +80,6 @@ export default function Orders() {
 
     useEffect(() => { fetchOrders(); }, [fetchOrders]);
     useEffect(() => { fetchStats(); }, [fetchStats]);
-    useEffect(() => { setPage(1); }, [statusFilter, search]);
 
     const handleStatusChange = async (orderId: number, newStatus: string) => {
         setUpdating(true);
@@ -75,6 +87,11 @@ export default function Orders() {
             await ordersApi.update(orderId, { status: newStatus as OrderData["status"] });
             setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, status: newStatus as OrderData["status"] } : o)));
             if (selectedOrder?.id === orderId) setSelectedOrder((prev) => prev ? { ...prev, status: newStatus as OrderData["status"] } : prev);
+            // Notify based on status change
+            const orderNum = orders.find((o) => o.id === orderId)?.order_number || `#${orderId}`;
+            const statusType = newStatus === "completed" ? "order_completed" : newStatus === "processing" ? "order_processing" : newStatus === "cancelled" ? "order_cancelled" : "info" as const;
+            addNotification({ type: statusType, title: `Order ${newStatus.charAt(0).toUpperCase() + newStatus.slice(1)}`, message: `Order ${orderNum} status changed to ${newStatus}`, panel: "admin", link: "/dashboard/orders" });
+            addNotification({ type: statusType, title: `Your Order ${newStatus.charAt(0).toUpperCase() + newStatus.slice(1)}`, message: `Order ${orderNum} is now ${newStatus}`, panel: "customer", link: "/customer/orders" });
             fetchStats();
             Swal.fire({ icon: "success", title: "Updated", text: `Status → ${newStatus}`, timer: 1500, showConfirmButton: false });
         } catch {
@@ -90,6 +107,9 @@ export default function Orders() {
             await ordersApi.update(orderId, { payment_status: newPayment as OrderData["payment_status"] });
             setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, payment_status: newPayment as OrderData["payment_status"] } : o)));
             if (selectedOrder?.id === orderId) setSelectedOrder((prev) => prev ? { ...prev, payment_status: newPayment as OrderData["payment_status"] } : prev);
+            const orderNum2 = orders.find((o) => o.id === orderId)?.order_number || `#${orderId}`;
+            addNotification({ type: "info", title: "Payment Updated", message: `Order ${orderNum2} payment status → ${newPayment}`, panel: "admin", link: "/dashboard/orders" });
+            addNotification({ type: "info", title: "Payment Updated", message: `Order ${orderNum2} payment status → ${newPayment}`, panel: "customer", link: "/customer/orders" });
             fetchStats();
             Swal.fire({ icon: "success", title: "Updated", text: `Payment → ${newPayment}`, timer: 1500, showConfirmButton: false });
         } catch {
@@ -177,35 +197,35 @@ export default function Orders() {
                                 <th className="px-6 py-3 text-left text-xs font-mono uppercase tracking-wider text-[#718096] dark:text-[#A0AEC0]">Payment</th>
                                 <th className="px-6 py-3 text-left text-xs font-mono uppercase tracking-wider text-[#718096] dark:text-[#A0AEC0]">Status</th>
                                 <th className="px-6 py-3 text-left text-xs font-mono uppercase tracking-wider text-[#718096] dark:text-[#A0AEC0]">Date</th>
-                                <th className="px-6 py-3" />
+                                <th className="px-3 sm:px-6 py-3" />
                             </tr>
                         </thead>
                         <tbody>
                             {loading ? (
-                                <tr><td colSpan={8} className="px-6 py-12 text-center text-[#A0AEC0]">
+                                <tr><td colSpan={8} className="px-3 sm:px-6 py-12 text-center text-[#A0AEC0]">
                                     <FaSpinner className="mx-auto mb-2 animate-spin" size={24} /> Loading orders...
                                 </td></tr>
                             ) : orders.length === 0 ? (
-                                <tr><td colSpan={8} className="px-6 py-12 text-center text-[#A0AEC0]">No orders found.</td></tr>
+                                <tr><td colSpan={8} className="px-3 sm:px-6 py-12 text-center text-[#A0AEC0]">No orders found.</td></tr>
                             ) : orders.map((order) => (
                                 <tr key={order.id} className="border-b border-[#E2E8F0]/50 dark:border-[#2D3748]/50 hover:bg-[#F9FAFC] dark:hover:bg-white/[0.02] transition-colors">
-                                    <td className="px-6 py-3.5 text-sm font-medium text-[#45CFFF] font-mono">{order.order_number}</td>
-                                    <td className="px-6 py-3.5">
+                                    <td className="px-3 sm:px-6 py-3 text-sm font-medium text-[#45CFFF] font-mono">{order.order_number}</td>
+                                    <td className="px-3 sm:px-6 py-3">
                                         <p className="text-sm font-medium text-[#1a1f36] dark:text-white">{order.customer_name}</p>
-                                        <p className="text-xs text-[#718096] dark:text-[#A0AEC0]">{order.customer_email}</p>
+                                        <p className="text-xs text-[#718096] dark:text-[#A0AEC0] hidden sm:block">{order.customer_email}</p>
                                     </td>
-                                    <td className="px-6 py-3.5 text-sm text-[#718096] dark:text-[#A0AEC0]">{order.items?.length ?? 0}</td>
-                                    <td className="px-6 py-3.5 text-sm font-semibold text-[#1a1f36] dark:text-white">৳{order.total_amount.toLocaleString()}</td>
-                                    <td className="px-6 py-3.5">
-                                        <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${PAYMENT_COLORS[order.payment_status] || ""}`}>{order.payment_status}</span>
+                                    <td className="px-3 sm:px-6 py-3 text-sm text-[#718096] dark:text-[#A0AEC0] hidden md:table-cell">{order.items?.length ?? 0}</td>
+                                    <td className="px-3 sm:px-6 py-3 text-sm font-semibold text-[#1a1f36] dark:text-white">৳{order.total_amount.toLocaleString()}</td>
+                                    <td className="px-3 sm:px-6 py-3">
+                                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${PAYMENT_COLORS[order.payment_status] || ""}`}>{order.payment_status}</span>
                                     </td>
-                                    <td className="px-6 py-3.5">
-                                        <span className={`px-2.5 py-1 rounded-full text-xs font-medium capitalize ${STATUS_COLORS[order.status] || ""}`}>{order.status}</span>
+                                    <td className="px-3 sm:px-6 py-3">
+                                        <span className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${STATUS_COLORS[order.status] || ""}`}>{order.status}</span>
                                     </td>
-                                    <td className="px-6 py-3.5 text-sm text-[#718096] dark:text-[#A0AEC0]">
+                                    <td className="px-3 sm:px-6 py-3 text-sm text-[#718096] dark:text-[#A0AEC0] hidden sm:table-cell">
                                         {new Date(order.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                                     </td>
-                                    <td className="px-6 py-3.5">
+                                    <td className="px-3 sm:px-6 py-3">
                                         <button onClick={() => setSelectedOrder(order)} className="p-1.5 rounded-lg hover:bg-[#45CFFF]/10 text-[#718096] hover:text-[#45CFFF] transition-all" title="View details">
                                             <FaEye size={13} />
                                         </button>
@@ -259,7 +279,7 @@ export default function Orders() {
                                             <p className="text-sm font-medium text-[#1a1f36] dark:text-white">{item.name}</p>
                                             <p className="text-xs text-[#A0AEC0]">{item.service_key} × {item.quantity}</p>
                                         </div>
-                                        <p className="text-sm font-medium text-[#1a1f36] dark:text-white">৳{item.price}</p>
+                                        <p className="text-sm font-medium text-[#1a1f36] dark:text-white">৳{safeNum(item.price).toLocaleString()}</p>
                                     </div>
                                 ))}
                             </div>
@@ -291,10 +311,16 @@ export default function Orders() {
 
                         <p className="mb-4 text-xs text-[#A0AEC0]">Created: {new Date(selectedOrder.created_at).toLocaleString()}</p>
 
-                        <button onClick={() => handleDelete(selectedOrder.id)}
-                            className="w-full rounded-lg border border-red-200 bg-red-50 py-2 text-sm font-medium text-red-600 hover:bg-red-100 dark:border-red-900/30 dark:bg-red-900/10 dark:text-red-400">
-                            Delete Order
-                        </button>
+                        <div className="flex gap-3">
+                            <button onClick={() => navigate(`/invoice/${selectedOrder.id}`)}
+                                className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg border border-[#1E56E0] bg-[#1E56E0]/5 py-2 text-sm font-medium text-[#1E56E0] hover:bg-[#1E56E0] hover:text-white transition-all dark:border-[#45CFFF]/30 dark:bg-[#45CFFF]/5 dark:text-[#45CFFF] dark:hover:bg-[#45CFFF]/20">
+                                <FaFileInvoice size={13} /> Create Invoice
+                            </button>
+                            <button onClick={() => handleDelete(selectedOrder.id)}
+                                className="flex-1 rounded-lg border border-red-200 bg-red-50 py-2 text-sm font-medium text-red-600 hover:bg-red-100 dark:border-red-900/30 dark:bg-red-900/10 dark:text-red-400">
+                                Delete Order
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

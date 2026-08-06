@@ -97,7 +97,7 @@ export default function CustomerProfile() {
                             <img src={avatarPreview} alt="Avatar" className="h-20 w-20 rounded-2xl object-cover border-2 border-[#45CFFF]/30" />
                         ) : (
                             <div className="h-20 w-20 rounded-2xl bg-gradient-to-br from-[#45CFFF] to-[#1E56E0] flex items-center justify-center">
-                                <span className="text-white text-2xl font-bold font-sora">{name.charAt(0)?.toUpperCase() || "C"}</span>
+                                <span className="text-white text-2xl font-bold font-sora">{(name || "C").charAt(0)?.toUpperCase() || "C"}</span>
                             </div>
                         )}
                         <button

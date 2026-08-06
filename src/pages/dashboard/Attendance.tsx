@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
+import { useResetPage } from "../../hooks/useResetPage";
 import {
     FaCheckCircle, FaTimesCircle,
     FaSearch, FaUsers, FaTimes, FaSpinner, FaUserCheck, FaPlus, FaEdit, FaTrash,
 } from "react-icons/fa";
 import { attendanceApi, employeesApi, type AttendanceData, type AttendanceStats, type EmployeeData } from "../../services";
+import { useNotifications } from "../../context/NotificationContext";
 import Pagination from "../../components/shared/Pagination";
 import DateRangePicker from "../../components/shared/DateRangePicker";
 import Swal from "sweetalert2";
@@ -18,6 +20,7 @@ const statusColors: Record<string, string> = {
 const departments = ["All", "Development", "Design", "Marketing", "HR", "Finance", "Operations"];
 
 export default function Attendance() {
+    const { addNotification } = useNotifications();
     const [records, setRecords] = useState<AttendanceData[]>([]);
     const [stats, setStats] = useState<AttendanceStats | null>(null);
     const [allEmployees, setAllEmployees] = useState<EmployeeData[]>([]);
@@ -28,7 +31,7 @@ export default function Attendance() {
     const [search, setSearch] = useState("");
     const [deptFilter, setDeptFilter] = useState("All");
     const [statusFilter, setStatusFilter] = useState("all");
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useResetPage([statusFilter, deptFilter, search, date, fromDate, toDate]);
     const [totalPages, setTotalPages] = useState(1);
     const [total, setTotal] = useState(0);
     const [showModal, setShowModal] = useState(false);
@@ -77,7 +80,6 @@ export default function Attendance() {
     useEffect(() => { fetchRecords(); }, [fetchRecords]);
     useEffect(() => { fetchStats(); }, [fetchStats]);
     useEffect(() => { fetchEmployees(); }, [fetchEmployees]);
-    useEffect(() => { setPage(1); }, [statusFilter, deptFilter, search, date, fromDate, toDate]);
 
     const resetForm = () => { setFormEmployeeId(""); setFormDate(new Date().toISOString().split("T")[0]); setFormCheckIn(""); setFormCheckOut(""); setFormHours(""); setFormStatus("Present"); setEditing(null); };
 
@@ -92,11 +94,26 @@ export default function Attendance() {
         if (!formEmployeeId || !formDate) { Swal.fire("Validation", "Employee and date are required", "warning"); return; }
         try {
             const payload = { employee_id: Number(formEmployeeId), date: formDate, check_in: formCheckIn || undefined, check_out: formCheckOut || undefined, hours: formHours ? Number(formHours) : undefined, status: formStatus as "Present" | "Absent" | "On Leave" | "Half Day" | "Late" };
+            const empName = allEmployees.find((e) => e.id === Number(formEmployeeId))?.name || "Employee";
             if (editing) {
                 await attendanceApi.update(editing.id, payload);
+                addNotification({
+                    panel: "employee",
+                    type: "attendance_marked",
+                    title: "Attendance Updated",
+                    message: `Admin updated your attendance for ${formDate} â€” Status: ${formStatus}`,
+                    link: "/user/attendance",
+                });
                 Swal.fire({ icon: "success", title: "Updated", timer: 1500, showConfirmButton: false });
             } else {
                 await attendanceApi.create(payload);
+                addNotification({
+                    panel: "employee",
+                    type: "attendance_marked",
+                    title: "Attendance Recorded",
+                    message: `${empName}'s attendance recorded for ${formDate} â€” Status: ${formStatus}`,
+                    link: "/user/attendance",
+                });
                 Swal.fire({ icon: "success", title: "Recorded", timer: 1500, showConfirmButton: false });
             }
             setShowModal(false); resetForm();
@@ -132,7 +149,7 @@ export default function Attendance() {
                     <h2 className="font-sora text-xl font-bold text-[#1a1f36] dark:text-white">Attendance Tracker</h2>
                     <p className="text-sm text-[#718096] dark:text-[#A0AEC0]">{stats?.present ?? 0} present today &bull; {stats?.absent ?? 0} absent</p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                     <DateRangePicker
                         fromDate={fromDate}
                         toDate={toDate}
@@ -186,31 +203,31 @@ export default function Attendance() {
                         <thead>
                             <tr className="border-b border-[#E2E8F0] dark:border-[#2D3748]">
                                 {["Employee", "Department", "Check In", "Check Out", "Hours", "Status", ""].map((h, i) => (
-                                    <th key={i} className="px-6 py-3 text-left text-xs font-mono uppercase tracking-wider text-[#718096] dark:text-[#A0AEC0]">{h}</th>
+                                    <th key={i} className="px-3 sm:px-6 py-3 text-left text-xs font-mono uppercase tracking-wider text-[#718096] dark:text-[#A0AEC0]">{h}</th>
                                 ))}
                             </tr>
                         </thead>
                         <tbody>
                             {loading ? (
-                                <tr><td colSpan={7} className="px-6 py-12 text-center text-[#A0AEC0]"><FaSpinner className="mx-auto animate-spin" size={20} /></td></tr>
+                                <tr><td colSpan={7} className="px-3 sm:px-6 py-12 text-center text-[#A0AEC0]"><FaSpinner className="mx-auto animate-spin" size={20} /></td></tr>
                             ) : records.length === 0 ? (
-                                <tr><td colSpan={7} className="px-6 py-12 text-center text-sm text-[#A0AEC0]">No attendance records for this date.</td></tr>
+                                <tr><td colSpan={7} className="px-3 sm:px-6 py-12 text-center text-sm text-[#A0AEC0]">No attendance records for this date.</td></tr>
                             ) : records.map((rec) => (
                                 <tr key={rec.id} className="border-b border-[#E2E8F0]/50 dark:border-[#2D3748]/50 hover:bg-[#F9FAFC] dark:hover:bg-white/[0.02] transition-colors">
-                                    <td className="px-6 py-3.5">
+                                    <td className="px-3 sm:px-6 py-3">
                                         <div className="flex items-center gap-3">
                                             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#45CFFF] to-[#1E56E0] flex items-center justify-center text-white text-xs font-bold">{rec.employee?.name?.charAt(0) || "?"}</div>
                                             <div><p className="text-sm font-medium text-[#1a1f36] dark:text-white">{rec.employee?.name || "Unknown"}</p><p className="text-xs text-[#718096] dark:text-[#A0AEC0]">{rec.employee?.role || ""}</p></div>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-3.5 text-sm text-[#718096] dark:text-[#A0AEC0]">{rec.employee?.department || ""}</td>
-                                    <td className="px-6 py-3.5 text-sm font-mono text-[#1a1f36] dark:text-white">{rec.check_in || "—"}</td>
-                                    <td className="px-6 py-3.5 text-sm font-mono text-[#1a1f36] dark:text-white">{rec.check_out || "—"}</td>
-                                    <td className="px-6 py-3.5 text-sm font-mono text-[#1a1f36] dark:text-white">{rec.hours ? `${rec.hours}h` : "—"}</td>
-                                    <td className="px-6 py-3.5">
+                                    <td className="px-3 sm:px-6 py-3 text-sm text-[#718096] dark:text-[#A0AEC0]">{rec.employee?.department || ""}</td>
+                                    <td className="px-3 sm:px-6 py-3 text-sm font-mono text-[#1a1f36] dark:text-white">{rec.check_in || "â€”"}</td>
+                                    <td className="px-3 sm:px-6 py-3 text-sm font-mono text-[#1a1f36] dark:text-white">{rec.check_out || "â€”"}</td>
+                                    <td className="px-3 sm:px-6 py-3 text-sm font-mono text-[#1a1f36] dark:text-white">{rec.hours ? `${rec.hours}h` : "â€”"}</td>
+                                    <td className="px-3 sm:px-6 py-3">
                                         <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${statusColors[rec.status] || ""}`}>{rec.status}</span>
                                     </td>
-                                    <td className="px-6 py-3.5">
+                                    <td className="px-3 sm:px-6 py-3">
                                         <div className="flex items-center gap-1">
                                             <button onClick={() => openEditModal(rec)} className="px-2 py-1 rounded-lg hover:bg-[#45CFFF]/10 text-[#718096] hover:text-[#45CFFF] text-xs transition-colors" title="Edit"><FaEdit size={12} /></button>
                                             <button onClick={() => handleDelete(rec.id)} className="px-2 py-1 rounded-lg hover:bg-red-500/10 text-[#718096] hover:text-red-500 text-xs transition-colors" title="Delete"><FaTrash size={12} /></button>

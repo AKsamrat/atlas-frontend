@@ -148,13 +148,13 @@ export default function Login() {
                 </div>
 
                 {/* Demo Credentials */}
-                <div className="mt-6 rounded-2xl bg-[#F9FAFC] dark:bg-[#0F1E3D]/50 border border-[#E2E8F0] dark:border-[#2D3748] p-4">
+                {/* <div className="mt-6 rounded-2xl bg-[#F9FAFC] dark:bg-[#0F1E3D]/50 border border-[#E2E8F0] dark:border-[#2D3748] p-4">
                     <p className="text-xs font-mono font-medium text-[#718096] dark:text-[#A0AEC0] mb-2">Demo Credentials:</p>
                     <div className="space-y-1 text-xs text-[#718096] dark:text-[#A0AEC0]">
                         <p><span className="font-medium text-[#1a1f36] dark:text-white">Admin:</span> admin@entra.com / admin123</p>
                         <p><span className="font-medium text-[#1a1f36] dark:text-white">User:</span> user@entra.com / user123</p>
                     </div>
-                </div>
+                </div> */}
             </div>
         </div>
     );

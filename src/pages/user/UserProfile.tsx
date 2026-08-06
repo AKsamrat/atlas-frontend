@@ -124,7 +124,7 @@ export default function UserProfile() {
                                 <img src={avatarPreview} alt={profile.name} className="w-24 h-24 rounded-2xl object-cover border-4 border-white dark:border-[#0F1E3D] shadow-xl" />
                             ) : (
                                 <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[#45CFFF] to-[#1E56E0] flex items-center justify-center text-white text-3xl font-sora font-bold border-4 border-white dark:border-[#0F1E3D] shadow-xl">
-                                    {profile.name.charAt(0)}
+                                    {(profile.name || "U").charAt(0)}
                                 </div>
                             )}
                             <button onClick={handleAvatarChange}

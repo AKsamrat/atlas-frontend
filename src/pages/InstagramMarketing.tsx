@@ -218,7 +218,7 @@ export default function InstagramMarketing() {
                                 />
                             ))}
                         </div>
-                        <p className="text-lg text-[#4A5568] dark:text-[#A0AEC0]">
+                        <p className="text-lg py-10 text-[#4A5568] dark:text-[#A0AEC0]">
                             No hidden fees. No long-term contracts. Cancel anytime.
                         </p>
                     </div>

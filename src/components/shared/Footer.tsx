@@ -25,8 +25,8 @@ import Swal from "sweetalert2";
 const SERVICES = [
     { label: "Domain & Hosting", href: "/domain-hosting", icon: Globe },
     { label: "Web Development", href: "/web-development", icon: Code },
-    { label: "Graphic Design", href: "/#design", icon: Palette },
-    { label: "Digital Marketing", href: "/#marketing", icon: Megaphone },
+    { label: "Graphic Design", href: "/graphic-design", icon: Palette },
+    { label: "Digital Marketing", href: "/digital-marketing", icon: Megaphone },
 ];
 
 const COMPANY = [
@@ -127,7 +127,7 @@ export default function Footer() {
                 {/*  CTA BANNER                                                */}
                 {/* ========================================================== */}
                 <div className="border-b border-black/6 dark:border-white/[0.05]">
-                    <div className="mx-auto flex max-w-7xl flex-col items-center gap-6 py-12 text-center md:flex-row md:justify-between md:text-left">
+                    <div className="mx-auto flex max-w-7xl flex-col items-center gap-2 md:gap-6 py-12 text-center md:flex-row md:justify-between md:text-left">
                         <div>
                             <h3 className="font-sora text-[1.45rem] font-bold leading-snug text-[#1a1f36] sm:text-[1.7rem] dark:text-white">
                                 Ready to grow your brand{" "}
@@ -161,7 +161,7 @@ export default function Footer() {
                 {/*  MAIN CONTENT                                              */}
                 {/* ========================================================== */}
                 <div className="mx-auto max-w-7xl">
-                    <div className="grid gap-10 py-14 lg:grid-cols-12 lg:gap-10">
+                    <div className="grid gap-4 py-14 px-4 md:px-0 lg:grid-cols-12 lg:gap-10">
                         {/* ================================================== */}
                         {/*  Brand column — logo, description, newsletter, social */}
                         {/* ================================================== */}

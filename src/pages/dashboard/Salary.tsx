@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
+import { useResetPage } from "../../hooks/useResetPage";
 import {
     FaSearch, FaMoneyBillWave, FaCheckCircle, FaClock,
     FaTimes, FaEye, FaFileInvoiceDollar, FaSpinner, FaPlus, FaEdit, FaTrash,
 } from "react-icons/fa";
 import { salaryApi, type SalaryData, type SalaryStats } from "../../services";
+import { useNotifications } from "../../context/NotificationContext";
 import Swal from "sweetalert2";
 
 const departments = ["Development", "Design", "Marketing", "HR", "Finance", "Operations"];
@@ -15,12 +17,13 @@ export default function Salary() {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useResetPage([statusFilter, search]);
     const [totalPages, setTotalPages] = useState(1);
     const [total, setTotal] = useState(0);
     const [showPayslip, setShowPayslip] = useState<SalaryData | null>(null);
     const [showPayAllModal, setShowPayAllModal] = useState(false);
     const [processing, setProcessing] = useState(false);
+    const { addNotification } = useNotifications();
     const [showModal, setShowModal] = useState(false);
     const [editingRecord, setEditingRecord] = useState<SalaryData | null>(null);
 
@@ -57,7 +60,6 @@ export default function Salary() {
 
     useEffect(() => { fetchRecords(); }, [fetchRecords]);
     useEffect(() => { fetchStats(); }, [fetchStats]);
-    useEffect(() => { setPage(1); }, [statusFilter, search]);
 
     const pendingCount = stats?.pending_count ?? 0;
 
@@ -78,9 +80,13 @@ export default function Salary() {
             const payload = { employee: formEmployee, department: formDepartment, base_salary: Number(formBase), allowances: Number(formAllowances) || 0, deductions: Number(formDeductions) || 0, bonus: Number(formBonus) || 0, period: formPeriod, bank_account: formBank };
             if (editingRecord) {
                 await salaryApi.update(editingRecord.id, payload);
+                addNotification({ type: "salary_created", title: "Salary Updated", message: `${formEmployee}'s salary record updated for ${formPeriod}`, panel: "admin", link: "/dashboard/salary" });
+                addNotification({ type: "salary_created", title: "Salary Record Updated", message: `Your salary record for ${formPeriod} has been updated`, panel: "employee", link: "/user/salary" });
                 Swal.fire({ icon: "success", title: "Updated", timer: 1500, showConfirmButton: false });
             } else {
                 await salaryApi.create(payload);
+                addNotification({ type: "salary_created", title: "Salary Record Created", message: `${formEmployee} — ${fmt(Number(formBase))} for ${formPeriod}`, panel: "admin", link: "/dashboard/salary" });
+                addNotification({ type: "salary_created", title: "New Salary Record", message: `A salary record for ${formPeriod} has been created`, panel: "employee", link: "/user/salary" });
                 Swal.fire({ icon: "success", title: "Created", timer: 1500, showConfirmButton: false });
             }
             setShowModal(false); resetForm();
@@ -104,6 +110,9 @@ export default function Salary() {
     const markAsPaid = async (id: number) => {
         try {
             await salaryApi.update(id, { status: "Paid", paid_date: new Date().toISOString().split("T")[0] });
+            const rec = records.find((r) => r.id === id);
+            addNotification({ type: "salary_paid", title: "Salary Paid", message: `${rec?.employee || "Employee"} salary marked as paid — ${fmt(rec?.net_salary || 0)}`, panel: "admin", link: "/dashboard/salary" });
+            addNotification({ type: "salary_paid", title: "Salary Paid", message: `Your salary for ${rec?.period || "the period"} has been paid`, panel: "employee", link: "/user/salary" });
             fetchRecords(); fetchStats();
             Swal.fire({ icon: "success", title: "Payment recorded", timer: 1500, showConfirmButton: false });
         } catch { Swal.fire("Error", "Failed to mark as paid", "error"); }
@@ -116,6 +125,8 @@ export default function Salary() {
             const today = new Date().toISOString().split("T")[0];
             for (const rec of pendingRecords) {
                 await salaryApi.update(rec.id, { status: "Paid", paid_date: today });
+                addNotification({ type: "salary_paid", title: "Salary Paid (Batch)", message: `${rec.employee} — ${fmt(rec.net_salary)} paid`, panel: "admin", link: "/dashboard/salary" });
+                addNotification({ type: "salary_paid", title: "Salary Paid", message: `Your salary for ${rec.period} has been paid`, panel: "employee", link: "/user/salary" });
             }
             setShowPayAllModal(false);
             fetchRecords(); fetchStats();
@@ -152,7 +163,7 @@ export default function Salary() {
             </div>
 
             {/* Summary Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                 {summaryCards.map((card) => (
                     <div key={card.label} className="rounded-2xl bg-white dark:bg-[#0F1E3D] border border-[#E2E8F0] dark:border-[#2D3748] p-4 hover:shadow-lg transition-all group">
                         <div className="flex items-center gap-3">
@@ -187,37 +198,37 @@ export default function Salary() {
                         <thead>
                             <tr className="border-b border-[#E2E8F0] dark:border-[#2D3748]">
                                 {["Employee", "Base Salary", "Allowances", "Deductions", "Bonus", "Net Pay", "Status", ""].map((h, i) => (
-                                    <th key={i} className="px-6 py-3 text-left text-xs font-mono uppercase tracking-wider text-[#718096] dark:text-[#A0AEC0]">{h}</th>
+                                    <th key={i} className="px-3 sm:px-6 py-3 text-left text-xs font-mono uppercase tracking-wider text-[#718096] dark:text-[#A0AEC0]">{h}</th>
                                 ))}
                             </tr>
                         </thead>
                         <tbody>
                             {loading ? (
-                                <tr><td colSpan={8} className="px-6 py-12 text-center text-[#A0AEC0]"><FaSpinner className="mx-auto animate-spin" size={20} /></td></tr>
+                                <tr><td colSpan={8} className="px-3 sm:px-6 py-12 text-center text-[#A0AEC0]"><FaSpinner className="mx-auto animate-spin" size={20} /></td></tr>
                             ) : records.length === 0 ? (
-                                <tr><td colSpan={8} className="px-6 py-12 text-center text-sm text-[#A0AEC0]">No salary records found.</td></tr>
+                                <tr><td colSpan={8} className="px-3 sm:px-6 py-12 text-center text-sm text-[#A0AEC0]">No salary records found.</td></tr>
                             ) : records.map((rec) => (
                                 <tr key={rec.id} className="border-b border-[#E2E8F0]/50 dark:border-[#2D3748]/50 hover:bg-[#F9FAFC] dark:hover:bg-white/[0.02] transition-colors">
-                                    <td className="px-6 py-3.5">
+                                    <td className="px-3 sm:px-6 py-3">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#45CFFF] to-[#1E56E0] flex items-center justify-center text-white text-xs font-bold">{rec.employee.charAt(0)}</div>
-                                            <div><p className="text-sm font-medium text-[#1a1f36] dark:text-white">{rec.employee}</p><p className="text-xs text-[#718096] dark:text-[#A0AEC0]">{rec.department}</p></div>
+                                            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#45CFFF] to-[#1E56E0] flex items-center justify-center text-white text-xs font-bold shrink-0">{(rec.employee || "?").charAt(0)}</div>
+                                            <div className="min-w-0"><p className="text-sm font-medium text-[#1a1f36] dark:text-white truncate">{rec.employee}</p><p className="text-xs text-[#718096] dark:text-[#A0AEC0] hidden sm:block">{rec.department}</p></div>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-3.5 text-sm font-mono text-[#1a1f36] dark:text-white">{fmt(rec.base_salary)}</td>
-                                    <td className="px-6 py-3.5 text-sm font-mono text-green-500">+{fmt(rec.allowances)}</td>
-                                    <td className="px-6 py-3.5 text-sm font-mono text-red-500">-{fmt(rec.deductions)}</td>
-                                    <td className="px-6 py-3.5 text-sm font-mono text-[#45CFFF]">+{fmt(rec.bonus)}</td>
-                                    <td className="px-6 py-3.5 text-sm font-mono font-bold text-[#1a1f36] dark:text-white">{fmt(rec.net_salary)}</td>
-                                    <td className="px-6 py-3.5">
-                                        <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${rec.status === "Paid" ? "bg-green-500/10 text-green-600 dark:text-green-400" : rec.status === "Pending" ? "bg-amber-500/10 text-amber-600 dark:text-amber-400" : "bg-blue-500/10 text-blue-600 dark:text-blue-400"}`}>
+                                    <td className="px-3 sm:px-6 py-3 text-sm font-mono text-[#1a1f36] dark:text-white">{fmt(rec.base_salary)}</td>
+                                    <td className="px-3 sm:px-6 py-3 text-sm font-mono text-green-500 hidden sm:table-cell">+{fmt(rec.allowances)}</td>
+                                    <td className="px-3 sm:px-6 py-3 text-sm font-mono text-red-500 hidden sm:table-cell">-{fmt(rec.deductions)}</td>
+                                    <td className="px-3 sm:px-6 py-3 text-sm font-mono text-[#45CFFF] hidden sm:table-cell">+{fmt(rec.bonus)}</td>
+                                    <td className="px-3 sm:px-6 py-3 text-sm font-mono font-bold text-[#1a1f36] dark:text-white">{fmt(rec.net_salary)}</td>
+                                    <td className="px-3 sm:px-6 py-3">
+                                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${rec.status === "Paid" ? "bg-green-500/10 text-green-600 dark:text-green-400" : rec.status === "Pending" ? "bg-amber-500/10 text-amber-600 dark:text-amber-400" : "bg-blue-500/10 text-blue-600 dark:text-blue-400"}`}>
                                             {rec.status === "Paid" && <FaCheckCircle size={10} className="inline mr-1" />}
                                             {rec.status === "Pending" && <FaClock size={10} className="inline mr-1" />}
                                             {rec.status === "Processing" && <FaSpinner size={10} className="inline mr-1 animate-spin" />}
                                             {rec.status}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-3.5">
+                                    <td className="px-3 sm:px-6 py-3">
                                         <div className="flex items-center gap-1">
                                             <button onClick={() => setShowPayslip(rec)} className="px-2 py-1 rounded-lg bg-blue-500/10 text-blue-500 text-xs hover:bg-blue-500/20 transition-colors" title="View payslip"><FaEye size={12} /></button>
                                             <button onClick={() => openEditModal(rec)} className="px-2 py-1 rounded-lg hover:bg-[#45CFFF]/10 text-[#718096] hover:text-[#45CFFF] text-xs transition-colors" title="Edit"><FaEdit size={12} /></button>
@@ -255,7 +266,7 @@ export default function Salary() {
                         </div>
                         <div className="px-6 py-5 space-y-4">
                             <div className="flex items-center gap-3 mb-4">
-                                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#45CFFF] to-[#1E56E0] flex items-center justify-center text-white font-bold font-sora text-lg">{showPayslip.employee.charAt(0)}</div>
+                                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#45CFFF] to-[#1E56E0] flex items-center justify-center text-white font-bold font-sora text-lg">{(showPayslip.employee || "?").charAt(0)}</div>
                                 <div><p className="font-semibold text-[#1a1f36] dark:text-white">{showPayslip.employee}</p><p className="text-xs text-[#718096] dark:text-[#A0AEC0]">{showPayslip.department} &mdash; {showPayslip.period}</p></div>
                             </div>
                             <div className="rounded-xl bg-[#F9FAFC] dark:bg-[#060B14] border border-[#E2E8F0] dark:border-[#2D3748] p-4 space-y-2">

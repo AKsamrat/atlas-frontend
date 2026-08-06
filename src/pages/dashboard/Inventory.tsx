@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useResetPage } from "../../hooks/useResetPage";
 import { FaSearch, FaWarehouse, FaExclamationTriangle, FaCheckCircle, FaEdit, FaTruck, FaBoxOpen, FaSpinner, FaTimes } from "react-icons/fa";
 import { productsApi, type ProductData, type ProductStats } from "../../services";
 import Swal from "sweetalert2";
@@ -17,7 +18,7 @@ export default function Inventory() {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState<string>("all");
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useResetPage([statusFilter, search]);
     const [totalPages, setTotalPages] = useState(1);
     const [total, setTotal] = useState(0);
     const [editItem, setEditItem] = useState<ProductData | null>(null);
@@ -45,7 +46,6 @@ export default function Inventory() {
 
     useEffect(() => { fetchInventory(); }, [fetchInventory]);
     useEffect(() => { fetchStats(); }, [fetchStats]);
-    useEffect(() => { setPage(1); }, [statusFilter, search]);
 
     const openEditStock = (p: ProductData) => {
         setEditItem(p);
@@ -130,28 +130,28 @@ export default function Inventory() {
                         <thead>
                             <tr className="border-b border-[#E2E8F0] dark:border-[#2D3748]">
                                 {["Item", "Category", "Stock", "Min Stock", "Status", "Supplier", ""].map((h) => (
-                                    <th key={h} className="px-6 py-3 text-left text-xs font-mono uppercase tracking-wider text-[#718096] dark:text-[#A0AEC0]">{h}</th>
+                                    <th key={h} className="px-3 sm:px-6 py-3 text-left text-xs font-mono uppercase tracking-wider text-[#718096] dark:text-[#A0AEC0]">{h}</th>
                                 ))}
                             </tr>
                         </thead>
                         <tbody>
                             {loading ? (
-                                <tr><td colSpan={7} className="px-6 py-12 text-center text-[#A0AEC0]"><FaSpinner className="mx-auto mb-2 animate-spin" size={24} /> Loading...</td></tr>
+                                <tr><td colSpan={7} className="px-3 sm:px-6 py-12 text-center text-[#A0AEC0]"><FaSpinner className="mx-auto mb-2 animate-spin" size={24} /> Loading...</td></tr>
                             ) : products.length === 0 ? (
-                                <tr><td colSpan={7} className="px-6 py-12 text-center text-[#A0AEC0]">No inventory items found.</td></tr>
+                                <tr><td colSpan={7} className="px-3 sm:px-6 py-12 text-center text-[#A0AEC0]">No inventory items found.</td></tr>
                             ) : products.map((p) => {
                                 const status = getStockStatus(p);
                                 const stockPct = p.min_stock > 0 ? (p.stock / p.min_stock) * 100 : 100;
                                 return (
                                     <tr key={p.id} className="border-b border-[#E2E8F0]/50 dark:border-[#2D3748]/50 hover:bg-[#F9FAFC] dark:hover:bg-white/[0.02] transition-colors">
-                                        <td className="px-6 py-3.5">
+                                        <td className="px-3 sm:px-6 py-3">
                                             <div>
                                                 <p className="text-sm font-medium text-[#1a1f36] dark:text-white">{p.name}</p>
                                                 <p className="text-xs text-[#718096] dark:text-[#A0AEC0]">ID: {p.id}</p>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-3.5"><span className="px-2.5 py-1 rounded-full text-xs font-medium bg-[#45CFFF]/10 text-[#45CFFF]">{p.category}</span></td>
-                                        <td className="px-6 py-3.5">
+                                        <td className="px-3 sm:px-6 py-3"><span className="px-2.5 py-1 rounded-full text-xs font-medium bg-[#45CFFF]/10 text-[#45CFFF]">{p.category}</span></td>
+                                        <td className="px-3 sm:px-6 py-3">
                                             <div className="flex items-center gap-2">
                                                 <span className="text-sm font-semibold text-[#1a1f36] dark:text-white">{p.stock}</span>
                                                 <div className="w-16 h-1.5 bg-[#E2E8F0] dark:bg-[#2D3748] rounded-full overflow-hidden">
@@ -160,12 +160,12 @@ export default function Inventory() {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-3.5 text-sm text-[#718096] dark:text-[#A0AEC0]">{p.min_stock}</td>
-                                        <td className="px-6 py-3.5">
+                                        <td className="px-3 sm:px-6 py-3 text-sm text-[#718096] dark:text-[#A0AEC0]">{p.min_stock}</td>
+                                        <td className="px-3 sm:px-6 py-3">
                                             <span className={`px-2.5 py-1 rounded-full text-xs font-medium capitalize ${STATUS_COLORS[status] || ""}`}>{getStatusLabel(status)}</span>
                                         </td>
-                                        <td className="px-6 py-3.5 text-sm text-[#718096] dark:text-[#A0AEC0]">{p.supplier || "—"}</td>
-                                        <td className="px-6 py-3.5">
+                                        <td className="px-3 sm:px-6 py-3 text-sm text-[#718096] dark:text-[#A0AEC0]">{p.supplier || "â€”"}</td>
+                                        <td className="px-3 sm:px-6 py-3">
                                             <button onClick={() => openEditStock(p)} className="p-1.5 rounded-lg hover:bg-[#45CFFF]/10 text-[#718096] hover:text-[#45CFFF] transition-all" title="Edit stock">
                                                 <FaEdit size={13} />
                                             </button>

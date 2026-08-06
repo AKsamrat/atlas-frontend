@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useResetPage } from "../../hooks/useResetPage";
 import {
     FaUsers, FaCheckCircle, FaTimes, FaUserMinus,
     FaSearch, FaCalendarAlt, FaTrash, FaSync, FaEnvelope,
@@ -33,11 +34,11 @@ export default function Subscribers() {
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState("All");
     const [searchTerm, setSearchTerm] = useState("");
-    const [page, setPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const [total, setTotal] = useState(0);
     const [fromDate, setFromDate] = useState("");
     const [toDate, setToDate] = useState("");
+    const [page, setPage] = useResetPage([filter, searchTerm, fromDate, toDate]);
+    const [totalPages, setTotalPages] = useState(1);
+    const [total, setTotal] = useState(0);
 
     const fetchData = useCallback(async () => {
         try {
@@ -66,7 +67,6 @@ export default function Subscribers() {
     }, [filter, page, searchTerm, fromDate, toDate]);
 
     useEffect(() => { fetchData(); }, [fetchData]);
-    useEffect(() => { setPage(1); }, [filter, searchTerm, fromDate, toDate]);
 
     const handleDelete = async (sub: SubscriberData) => {
         const result = await Swal.fire({
@@ -103,7 +103,7 @@ export default function Subscribers() {
 
     return (
         <div className="space-y-6">
-            {/* ── Header ── */}
+            {/* â”€â”€ Header â”€â”€ */}
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h1 className="font-sora text-2xl font-bold text-[#1a1f36] dark:text-white">
@@ -122,7 +122,7 @@ export default function Subscribers() {
                 </button>
             </div>
 
-            {/* ── Stats ── */}
+            {/* â”€â”€ Stats â”€â”€ */}
             <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
                 {[
                     { label: "Total Subscribers", value: stats.total, icon: FaUsers, color: "from-[#1E56E0] to-[#2E8BF0]" },
@@ -151,7 +151,7 @@ export default function Subscribers() {
                 ))}
             </div>
 
-            {/* ── Filters ── */}
+            {/* â”€â”€ Filters â”€â”€ */}
             <div className="flex flex-col gap-4 rounded-2xl border border-[#e2e8f0] bg-white p-4 dark:border-white/[0.06] dark:bg-[#0d1829] sm:flex-row sm:items-center">
                 {/* Status Filter */}
                 <div className="flex items-center gap-2">
@@ -191,28 +191,28 @@ export default function Subscribers() {
                 />
             </div>
 
-            {/* ── Table ── */}
+            {/* â”€â”€ Table â”€â”€ */}
             <div className="overflow-hidden rounded-2xl border border-[#e2e8f0] bg-white dark:border-white/[0.06] dark:bg-[#0d1829]">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm">
                         <thead>
                             <tr className="border-b border-[#e2e8f0] bg-[#f8fafc] dark:border-white/[0.06] dark:bg-white/[0.02]">
-                                <th className="px-5 py-3.5 font-sora text-xs font-semibold uppercase tracking-wider text-[#8b95ad] dark:text-[#7C8AAD]">
+                                <th className="px-3 sm:px-5 py-3 font-sora text-xs font-semibold uppercase tracking-wider text-[#8b95ad] dark:text-[#7C8AAD]">
                                     #
                                 </th>
-                                <th className="px-5 py-3.5 font-sora text-xs font-semibold uppercase tracking-wider text-[#8b95ad] dark:text-[#7C8AAD]">
+                                <th className="px-3 sm:px-5 py-3 font-sora text-xs font-semibold uppercase tracking-wider text-[#8b95ad] dark:text-[#7C8AAD]">
                                     Email
                                 </th>
-                                <th className="px-5 py-3.5 font-sora text-xs font-semibold uppercase tracking-wider text-[#8b95ad] dark:text-[#7C8AAD]">
+                                <th className="px-3 sm:px-5 py-3 font-sora text-xs font-semibold uppercase tracking-wider text-[#8b95ad] dark:text-[#7C8AAD]">
                                     Name
                                 </th>
-                                <th className="px-5 py-3.5 font-sora text-xs font-semibold uppercase tracking-wider text-[#8b95ad] dark:text-[#7C8AAD]">
+                                <th className="px-3 sm:px-5 py-3 font-sora text-xs font-semibold uppercase tracking-wider text-[#8b95ad] dark:text-[#7C8AAD]">
                                     Status
                                 </th>
-                                <th className="px-5 py-3.5 font-sora text-xs font-semibold uppercase tracking-wider text-[#8b95ad] dark:text-[#7C8AAD]">
+                                <th className="px-3 sm:px-5 py-3 font-sora text-xs font-semibold uppercase tracking-wider text-[#8b95ad] dark:text-[#7C8AAD]">
                                     Subscribed
                                 </th>
-                                <th className="px-5 py-3.5 font-sora text-xs font-semibold uppercase tracking-wider text-[#8b95ad] dark:text-[#7C8AAD]">
+                                <th className="px-3 sm:px-5 py-3 font-sora text-xs font-semibold uppercase tracking-wider text-[#8b95ad] dark:text-[#7C8AAD]">
                                     Actions
                                 </th>
                             </tr>
@@ -220,14 +220,14 @@ export default function Subscribers() {
                         <tbody className="divide-y divide-[#e2e8f0] dark:divide-white/[0.04]">
                             {loading ? (
                                 <tr>
-                                    <td colSpan={6} className="px-5 py-16 text-center text-[#8b95ad] dark:text-[#7C8AAD]">
+                                    <td colSpan={6} className="px-3 sm:px-5 py-16 text-center text-[#8b95ad] dark:text-[#7C8AAD]">
                                         <FaSync className="mx-auto mb-2 animate-spin" size={20} />
                                         Loading subscribers...
                                     </td>
                                 </tr>
                             ) : subscribers.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="px-5 py-16 text-center text-[#8b95ad] dark:text-[#7C8AAD]">
+                                    <td colSpan={6} className="px-3 sm:px-5 py-16 text-center text-[#8b95ad] dark:text-[#7C8AAD]">
                                         <FaEnvelope className="mx-auto mb-2 opacity-30" size={32} />
                                         No subscribers found
                                     </td>
@@ -238,25 +238,25 @@ export default function Subscribers() {
                                         key={sub.id}
                                         className="transition-colors hover:bg-[#f8fafc] dark:hover:bg-white/[0.02]"
                                     >
-                                        <td className="px-5 py-3.5 text-[#8b95ad] dark:text-[#7C8AAD]">
+                                        <td className="px-3 sm:px-5 py-3 text-[#8b95ad] dark:text-[#7C8AAD]">
                                             {(page - 1) * 10 + idx + 1}
                                         </td>
-                                        <td className="px-5 py-3.5 font-medium text-[#1a1f36] dark:text-white">
+                                        <td className="px-3 sm:px-5 py-3 font-medium text-[#1a1f36] dark:text-white">
                                             {sub.email}
                                         </td>
-                                        <td className="px-5 py-3.5 text-[#8b95ad] dark:text-[#7C8AAD]">
-                                            {sub.name || "—"}
+                                        <td className="px-3 sm:px-5 py-3 text-[#8b95ad] dark:text-[#7C8AAD]">
+                                            {sub.name || "â€”"}
                                         </td>
-                                        <td className="px-5 py-3.5">
+                                        <td className="px-3 sm:px-5 py-3">
                                             <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${statusColors[sub.status] || ""}`}>
                                                 {sub.status === "active" ? <FaCheckCircle size={10} /> : <FaTimes size={10} />}
                                                 {sub.status}
                                             </span>
                                         </td>
-                                        <td className="px-5 py-3.5 text-sm text-[#8b95ad] dark:text-[#7C8AAD]">
+                                        <td className="px-3 sm:px-5 py-3 text-sm text-[#8b95ad] dark:text-[#7C8AAD]">
                                             {fmtDate(sub.created_at)}
                                         </td>
-                                        <td className="px-5 py-3.5">
+                                        <td className="px-3 sm:px-5 py-3">
                                             <div className="flex items-center gap-2">
                                                 <button
                                                     onClick={() => toggleStatus(sub)}

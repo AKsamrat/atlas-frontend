@@ -4,6 +4,8 @@ import {
     FaHistory, FaPlay, FaStop, FaSpinner,
 } from "react-icons/fa";
 import { userApi, type MyAttendance } from "../../services";
+import { useNotifications } from "../../context/NotificationContext";
+import { useAuth } from "../../context/AuthContext";
 import Pagination from "../../components/shared/Pagination";
 import DateRangePicker from "../../components/shared/DateRangePicker";
 import Swal from "sweetalert2";
@@ -24,6 +26,8 @@ const fmtDate = (d: string) => {
 };
 
 export default function UserAttendance() {
+    const { addNotification } = useNotifications();
+    const { user } = useAuth();
     const [view, setView] = useState<ViewMode>("today");
     const [records, setRecords] = useState<MyAttendance[]>([]);
     const [loading, setLoading] = useState(true);
@@ -106,6 +110,13 @@ export default function UserAttendance() {
             setClockedInToday(true);
             setTodayRecord(rec);
             setRecords((prev) => [rec, ...prev]);
+            addNotification({
+                panel: "admin",
+                type: "attendance_marked",
+                title: "Attendance — Clock In",
+                message: `${user?.name || "Employee"} clocked in at ${new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true })}`,
+                link: "/dashboard/attendance",
+            });
             Swal.fire({ icon: "success", title: "Clocked In!", text: `You clocked in at ${new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true })}`, timer: 2000, showConfirmButton: false });
         } catch {
             Swal.fire("Error", "Failed to clock in. Please try again.", "error");
@@ -123,6 +134,13 @@ export default function UserAttendance() {
             setTodayRecord(updated);
             setElapsed("00:00:00");
             setRecords((prev) => prev.map((r) => r.date === updated.date ? updated : r));
+            addNotification({
+                panel: "admin",
+                type: "attendance_marked",
+                title: "Attendance — Clock Out",
+                message: `${user?.name || "Employee"} clocked out at ${new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true })}`,
+                link: "/dashboard/attendance",
+            });
             Swal.fire({ icon: "success", title: "Clocked Out!", text: `You clocked out at ${new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true })}`, timer: 2000, showConfirmButton: false });
         } catch {
             Swal.fire("Error", "Failed to clock out. Please try again.", "error");

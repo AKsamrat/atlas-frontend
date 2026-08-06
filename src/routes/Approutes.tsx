@@ -13,6 +13,7 @@ import DailySubmissions from "../pages/dashboard/DailySubmissions";
 import Subscribers from "../pages/dashboard/Subscribers";
 import Payroll from "../pages/dashboard/Payroll";
 import Orders from "../pages/dashboard/Orders";
+import POS from "../pages/dashboard/POS";
 import Users from "../pages/dashboard/Users";
 import Customers from "../pages/dashboard/Customers";
 import Inventory from "../pages/dashboard/Inventory";
@@ -26,6 +27,7 @@ import ContactManager from "../pages/dashboard/content/ContactManager";
 import DomainPackagesManager from "../pages/dashboard/content/DomainPackagesManager";
 import ServicePackagesManager from "../pages/dashboard/content/ServicePackagesManager";
 import Settings from "../pages/dashboard/Settings";
+import AdminNotifications from "../pages/dashboard/Notifications";
 import CommonLayout from "../layouts/CommonLayouts";
 import DashboardLayout from "../layouts/DashboardLayouts";
 import UserLayout from "../layouts/UserLayouts";
@@ -35,10 +37,12 @@ import UserAttendance from "../pages/user/UserAttendance";
 import UserLeave from "../pages/user/UserLeave";
 import UserSalary from "../pages/user/UserSalary";
 import UserDailySubmission from "../pages/user/UserDailySubmission";
+import UserNotifications from "../pages/user/UserNotifications";
 import CustomerLayout from "../layouts/CustomerLayouts";
 import CustomerDashboard from "../pages/customer/CustomerDashboard";
 import CustomerOrders from "../pages/customer/CustomerOrders";
 import CustomerProfile from "../pages/customer/CustomerProfile";
+import CustomerNotifications from "../pages/customer/CustomerNotifications";
 import Shope from "../pages/Shope";
 import Product from "../pages/dashboard/Product";
 import WeCare from "../pages/WeCare";
@@ -54,6 +58,8 @@ import TShirtDesign from "../pages/TShirtDesign";
 import BrochureDesign from "../pages/BrochureDesign";
 import FlyerDesign from "../pages/FlyerDesign";
 import LogoBranding from "../pages/LogoBranding";
+import GraphicDesign from "../pages/GraphicDesign";
+import DigitalMarketing from "../pages/DigitalMarketing";
 import FacebookMarketing from "../pages/FacebookMarketing";
 import InstagramMarketing from "../pages/InstagramMarketing";
 import LikesFollowers from "../pages/LikesFollowers";
@@ -62,6 +68,7 @@ import PrivacyPolicy from "../pages/PrivacyPolicy";
 import TermsOfService from "../pages/TermsOfService";
 import HelpCenter from "../pages/HelpCenter";
 import Blog from "../pages/Blog";
+import Invoice from "../pages/Invoice";
 import ProtectedRoute from "./ProtectedRoute";
 
 const AppRoutes = () => {
@@ -76,6 +83,8 @@ const AppRoutes = () => {
                 <Route path="/BusinessValue" element={<BusinessValue />} />
                 <Route path="/domain-hosting" element={<DomainHosting />} />
                 <Route path="/web-development" element={<WebDevelopment />} />
+                <Route path="/graphic-design" element={<GraphicDesign />} />
+                <Route path="/digital-marketing" element={<DigitalMarketing />} />
                 <Route path="/about-us" element={<AboutUs />} />
                 {/* Design sub-pages */}
                 <Route path="/design/t-shirt" element={<TShirtDesign />} />
@@ -96,6 +105,7 @@ const AppRoutes = () => {
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/invoice/:id" element={<Invoice />} />
                 <Route path="/Newsfeed" element={<Newsfeed />} />
                 <Route path="/contact" element={<Contact />} />
             </Route>
@@ -104,6 +114,7 @@ const AppRoutes = () => {
             <Route path="/dashboard" element={<ProtectedRoute allowedRoles={["admin"]}><DashboardLayout /></ProtectedRoute>}>
                 <Route index element={<DashboardHome />} />
                 <Route path="products" element={<Product />} />
+                <Route path="pos" element={<POS />} />
                 <Route path="orders" element={<Orders />} />
                 <Route path="users" element={<Users />} />
                 <Route path="employees" element={<Employees />} />
@@ -126,6 +137,7 @@ const AppRoutes = () => {
                 <Route path="content/service-packages" element={<ServicePackagesManager />} />
                 <Route path="subscribers" element={<Subscribers />} />
                 <Route path="settings" element={<Settings />} />
+                <Route path="notifications" element={<AdminNotifications />} />
             </Route>
 
             {/* User Panel Routes — employees */}
@@ -136,12 +148,14 @@ const AppRoutes = () => {
                 <Route path="leave" element={<UserLeave />} />
                 <Route path="salary" element={<UserSalary />} />
                 <Route path="daily-submission" element={<UserDailySubmission />} />
+                <Route path="notifications" element={<UserNotifications />} />
             </Route>
 
             {/* Customer Panel Routes */}
             <Route path="/customer" element={<ProtectedRoute allowedRoles={["customer"]}><CustomerLayout /></ProtectedRoute>}>
                 <Route index element={<CustomerDashboard />} />
                 <Route path="orders" element={<CustomerOrders />} />
+                <Route path="notifications" element={<CustomerNotifications />} />
                 <Route path="profile" element={<CustomerProfile />} />
             </Route>
         </Routes>

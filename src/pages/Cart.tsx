@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
     Trash2,
@@ -17,7 +17,8 @@ import {
 } from "lucide-react";
 import { useCart } from "../store/useCart";
 import { useAuth } from "../context/AuthContext";
-import { ordersApi } from "../services";
+import { useNotifications } from "../context/NotificationContext";
+import { ordersApi, customerPanelApi } from "../services";
 import Swal from "sweetalert2";
 
 /* ------------------------------------------------------------------ */
@@ -37,13 +38,32 @@ const INITIAL_FORM: CheckoutForm = { name: "", email: "", phone: "", country: ""
 export default function Cart() {
     const { items, totalItems, totalPrice, removeItem, updateQuantity, clearCart } = useCart();
     const { user } = useAuth();
+    const { addNotification } = useNotifications();
     const [checkoutOpen, setCheckoutOpen] = useState(false);
     const [form, setForm] = useState<CheckoutForm>(() =>
-        user ? { name: user.name, email: user.email, phone: "", country: "" } : INITIAL_FORM
+        user ? { name: user.name, email: user.email, phone: (user as unknown as Record<string, unknown>).phone as string || "", country: (user as unknown as Record<string, unknown>).country as string || "" } : INITIAL_FORM
     );
     const [errors, setErrors] = useState<Partial<Record<keyof CheckoutForm, string>>>({});
     const [submitted, setSubmitted] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+    // Pre-fill phone & country from the customer's most recent order
+    useEffect(() => {
+        if (user) {
+            customerPanelApi
+                .getOrders({ per_page: 1 })
+                .then((res) => {
+                    const latest = res.data?.data?.[0];
+                    if (latest) {
+                        setForm((prev) => ({
+                            ...prev,
+                            phone: prev.phone || latest.customer_phone || "",
+                            country: prev.country || latest.customer_country || "",
+                        }));
+                    }
+                })
+                .catch(() => { /* not critical */ });
+        }
+    }, [user]);
 
     const handleChange = (field: keyof CheckoutForm, value: string) => {
         setForm((prev) => ({ ...prev, [field]: value }));
@@ -67,7 +87,7 @@ export default function Cart() {
 
         setSubmitting(true);
         try {
-            await ordersApi.create({
+            const orderRes = await ordersApi.create({
                 customer_name: form.name,
                 customer_email: form.email,
                 customer_phone: form.phone,
@@ -80,6 +100,26 @@ export default function Cart() {
                     quantity: item.quantity,
                 })),
             });
+
+            // Notify admin panel of new order
+            try {
+                const ordNum = orderRes?.data?.order_number ?? "#" + (orderRes?.data?.id ?? "");
+                addNotification({
+                    type: "order_created",
+                    title: "New Order Received",
+                    message: `Order ${ordNum} from ${form.name} — ${items.length} item(s)`,
+                    panel: "admin",
+                    link: "/dashboard/orders",
+                });
+                // Notify customer
+                addNotification({
+                    type: "order_created",
+                    title: "Order Placed Successfully",
+                    message: `Your order ${ordNum} has been placed. We'll contact you shortly.`,
+                    panel: "customer",
+                    link: "/customer/orders",
+                });
+            } catch (notifErr) { console.error("Notification error:", notifErr); }
 
             clearCart();
             setSubmitted(true);
@@ -362,24 +402,24 @@ export default function Cart() {
                                             <select
                                                 value={form.country}
                                                 onChange={(e) => handleChange("country", e.target.value)}
-                                                className={`w-full rounded-xl border ${errors.country ? "border-red-400" : "border-black/10 dark:border-white/[0.1]"
-                                                    } bg-black/[0.02] px-4 py-2.5 text-[0.88rem] text-[#1a1f36] transition-colors focus:border-[#45CFFF] focus:outline-none focus:ring-1 focus:ring-[#45CFFF]/30 dark:bg-white/[0.04] dark:text-white`}
+                                                className={`w-full rounded-xl border px-4 py-2.5 text-[0.88rem] transition-colors focus:border-[#45CFFF] focus:outline-none focus:ring-1 focus:ring-[#45CFFF]/30 ${errors.country ? "border-red-400" : "border-black/10 dark:border-white/[0.1]"} bg-[#f8f9fc] text-[#1a1f36] dark:bg-[#0F1E3D] dark:text-white`}
+                                                style={{ colorScheme: "light" }}
                                             >
-                                                <option value="">Select country</option>
-                                                <option value="Bangladesh">Bangladesh</option>
-                                                <option value="India">India</option>
-                                                <option value="Pakistan">Pakistan</option>
-                                                <option value="United States">United States</option>
-                                                <option value="United Kingdom">United Kingdom</option>
-                                                <option value="Canada">Canada</option>
-                                                <option value="Australia">Australia</option>
-                                                <option value="Germany">Germany</option>
-                                                <option value="France">France</option>
-                                                <option value="Japan">Japan</option>
-                                                <option value="Singapore">Singapore</option>
-                                                <option value="UAE">United Arab Emirates</option>
-                                                <option value="Saudi Arabia">Saudi Arabia</option>
-                                                <option value="Other">Other</option>
+                                                <option value="" style={{ color: "#e9ebf2" }}>Select country</option>
+                                                <option className="text-white" value="Bangladesh" style={{ color: "#e9ebf2" }}>Bangladesh</option>
+                                                <option value="India" style={{ color: "#e9ebf2" }}>India</option>
+                                                <option value="Pakistan" style={{ color: "#e9ebf2" }}>Pakistan</option>
+                                                <option value="United States" style={{ color: "#e9ebf2" }}>United States</option>
+                                                <option value="United Kingdom" style={{ color: "#e9ebf2" }}>United Kingdom</option>
+                                                <option value="Canada" style={{ color: "#e9ebf2" }}>Canada</option>
+                                                <option value="Australia" style={{ color: "#e9ebf2" }}>Australia</option>
+                                                <option value="Germany" style={{ color: "#e9ebf2" }}>Germany</option>
+                                                <option value="France" style={{ color: "#e9ebf2" }}>France</option>
+                                                <option value="Japan" style={{ color: "#e9ebf2" }}>Japan</option>
+                                                <option value="Singapore" style={{ color: "#e9ebf2" }}>Singapore</option>
+                                                <option value="UAE" style={{ color: "#e9ebf2" }}>United Arab Emirates</option>
+                                                <option value="Saudi Arabia" style={{ color: "#e9ebf2" }}>Saudi Arabia</option>
+                                                <option value="Other" style={{ color: "#e9ebf2" }}>Other</option>
                                             </select>
                                             {errors.country && <p className="mt-1 text-[0.75rem] text-red-400">{errors.country}</p>}
                                         </div>

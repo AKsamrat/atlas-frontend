@@ -91,9 +91,11 @@ function getStoredCart(): CartState {
 
 /* ---- Context (lives in useCart.ts) ---- */
 import { CartContext } from "./useCart";
+import { useToast } from "../components/shared/Toast";
 
 export function CartProvider({ children }: { children: ReactNode }) {
     const [state, dispatch] = useReducer(cartReducer, undefined, getStoredCart);
+    const { showToast } = useToast();
 
     // Persist to localStorage
     useEffect(() => {
@@ -102,7 +104,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     const addItem = useCallback((item: Omit<CartItem, "quantity">) => {
         dispatch({ type: "ADD_ITEM", payload: item });
-    }, []);
+        showToast(`"${item.name}" added to cart`, "success");
+    }, [showToast]);
 
     const removeItem = useCallback((id: string) => {
         dispatch({ type: "REMOVE_ITEM", payload: { id } });

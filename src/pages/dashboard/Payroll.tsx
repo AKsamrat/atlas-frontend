@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useResetPage } from "../../hooks/useResetPage";
 import {
     FaDollarSign, FaCheckCircle, FaClock, FaSpinner, FaPlus, FaTrash, FaEye, FaTimes, FaCreditCard,
 } from "react-icons/fa";
@@ -20,7 +21,7 @@ export default function Payroll() {
     const [statusFilter, setStatusFilter] = useState("all");
     const [fromDate, setFromDate] = useState("");
     const [toDate, setToDate] = useState("");
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useResetPage([statusFilter, search, fromDate, toDate]);
     const [totalPages, setTotalPages] = useState(1);
     const [total, setTotal] = useState(0);
     const [showModal, setShowModal] = useState(false);
@@ -71,7 +72,6 @@ export default function Payroll() {
     useEffect(() => { fetchStats(); }, [fetchStats]);
     useEffect(() => { fetchEmployees(); }, [fetchEmployees]);
     useEffect(() => { fetchAccounts(); }, [fetchAccounts]);
-    useEffect(() => { setPage(1); }, [statusFilter, search, fromDate, toDate]);
 
     const resetForm = () => { setFormEmployeeId(""); setFormAccountId(""); setFormBaseSalary(""); setFormBonus("0"); setFormDeduction("0"); setFormStatus("Pending"); setFormPeriod(""); setFormPaidDate(""); };
 
@@ -180,37 +180,37 @@ export default function Payroll() {
                         <thead>
                             <tr className="border-b border-[#E2E8F0] dark:border-[#2D3748]">
                                 {["Employee", "Period", "Account", "Base", "Bonus", "Deduction", "Net Salary", "Status", ""].map((h, i) => (
-                                    <th key={i} className="px-5 py-3 text-left text-xs font-mono uppercase tracking-wider text-[#718096] dark:text-[#A0AEC0]">{h}</th>
+                                    <th key={i} className="px-3 sm:px-5 py-3 text-left text-xs font-mono uppercase tracking-wider text-[#718096] dark:text-[#A0AEC0]">{h}</th>
                                 ))}
                             </tr>
                         </thead>
                         <tbody>
                             {loading ? (
-                                <tr><td colSpan={8} className="px-6 py-12 text-center text-[#A0AEC0]"><FaSpinner className="mx-auto animate-spin" size={20} /></td></tr>
+                                <tr><td colSpan={8} className="px-3 sm:px-5 py-12 text-center text-[#A0AEC0]"><FaSpinner className="mx-auto animate-spin" size={20} /></td></tr>
                             ) : records.length === 0 ? (
-                                <tr><td colSpan={8} className="px-6 py-12 text-center text-sm text-[#A0AEC0]">No payroll records found.</td></tr>
+                                <tr><td colSpan={8} className="px-3 sm:px-5 py-12 text-center text-sm text-[#A0AEC0]">No payroll records found.</td></tr>
                             ) : records.map((rec) => (
                                 <tr key={rec.id} className="border-b border-[#E2E8F0]/50 dark:border-[#2D3748]/50 hover:bg-[#F9FAFC] dark:hover:bg-white/[0.02] transition-colors">
-                                    <td className="px-5 py-3.5">
+                                    <td className="px-3 sm:px-5 py-3">
                                         <div className="flex items-center gap-3">
                                             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#45CFFF] to-[#1E56E0] flex items-center justify-center text-white text-xs font-bold">{rec.employee?.name?.charAt(0) || "?"}</div>
                                             <div><p className="text-sm font-medium text-[#1a1f36] dark:text-white">{rec.employee?.name || "Unknown"}</p><p className="text-xs text-[#718096] dark:text-[#A0AEC0]">{rec.employee?.department || ""}</p></div>
                                         </div>
                                     </td>
-                                    <td className="px-5 py-3.5 text-sm font-mono text-[#1a1f36] dark:text-white">{rec.period}</td>
-                                    <td className="px-5 py-3.5 text-sm text-[#718096] dark:text-[#A0AEC0]">{rec.account?.name || <span className="italic text-[#A0AEC0]">—</span>}</td>
-                                    <td className="px-5 py-3.5 text-sm text-[#1a1f36] dark:text-white">{fmt(rec.base_salary)}</td>
-                                    <td className="px-5 py-3.5 text-sm text-green-600 dark:text-green-400">+{fmt(rec.bonus)}</td>
-                                    <td className="px-5 py-3.5 text-sm text-red-500">-{fmt(rec.deduction)}</td>
-                                    <td className="px-5 py-3.5 text-sm font-bold text-[#1a1f36] dark:text-white">{fmt(rec.net_salary)}</td>
-                                    <td className="px-5 py-3.5">
+                                    <td className="px-3 sm:px-5 py-3 text-sm font-mono text-[#1a1f36] dark:text-white">{rec.period}</td>
+                                    <td className="px-3 sm:px-5 py-3 text-sm text-[#718096] dark:text-[#A0AEC0]">{rec.account?.name || <span className="italic text-[#A0AEC0]">â€”</span>}</td>
+                                    <td className="px-3 sm:px-5 py-3 text-sm text-[#1a1f36] dark:text-white">{fmt(rec.base_salary)}</td>
+                                    <td className="px-3 sm:px-5 py-3 text-sm text-green-600 dark:text-green-400">+{fmt(rec.bonus)}</td>
+                                    <td className="px-3 sm:px-5 py-3 text-sm text-red-500">-{fmt(rec.deduction)}</td>
+                                    <td className="px-3 sm:px-5 py-3 text-sm font-bold text-[#1a1f36] dark:text-white">{fmt(rec.net_salary)}</td>
+                                    <td className="px-3 sm:px-5 py-3">
                                         <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${statusColors[rec.status] || ""}`}>
                                             {rec.status === "Paid" && <FaCheckCircle size={10} className="inline mr-1" />}
                                             {rec.status === "Pending" && <FaClock size={10} className="inline mr-1" />}
                                             {rec.status}
                                         </span>
                                     </td>
-                                    <td className="px-5 py-3.5">
+                                    <td className="px-3 sm:px-5 py-3">
                                         <div className="flex items-center gap-1">
                                             <button onClick={() => setViewRecord(rec)} className="px-2 py-1 rounded-lg bg-blue-500/10 text-blue-500 text-xs hover:bg-blue-500/20 transition-colors" title="View"><FaEye size={12} /></button>
                                             {rec.status === "Pending" && (
@@ -285,7 +285,7 @@ export default function Payroll() {
                                 <select value={formAccountId} onChange={(e) => setFormAccountId(e.target.value)}
                                     className="w-full px-4 py-2.5 rounded-xl bg-[#F9FAFC] dark:bg-[#060B14] border border-[#E2E8F0] dark:border-[#2D3748] text-sm text-[#1a1f36] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#45CFFF]">
                                     <option value="">Select account (optional)</option>
-                                    {allAccounts.map((a) => <option key={a.id} value={a.id}>{a.name} — {a.type}</option>)}
+                                    {allAccounts.map((a) => <option key={a.id} value={a.id}>{a.name} â€” {a.type}</option>)}
                                 </select>
                                 <p className="text-xs text-[#718096] dark:text-[#A0AEC0] mt-1">Choose which account to pay salary from</p>
                             </div>

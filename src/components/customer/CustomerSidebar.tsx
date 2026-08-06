@@ -9,6 +9,7 @@ import {
     FaBars,
     FaChevronRight,
     FaTimes,
+    FaBell,
 } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
 import entraLogo from "../../assets/entra-logo.png";
@@ -19,6 +20,7 @@ import entraLogo from "../../assets/entra-logo.png";
 const customerRoutes = [
     { name: "Dashboard", path: "/customer", icon: FaTachometerAlt },
     { name: "My Orders", path: "/customer/orders", icon: FaShoppingBag },
+    { name: "Notifications", path: "/customer/notifications", icon: FaBell },
     { name: "My Profile", path: "/customer/profile", icon: FaUser },
 ];
 

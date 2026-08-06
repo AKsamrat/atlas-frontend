@@ -4,6 +4,8 @@ import {
     FaCheckCircle, FaClock, FaCalendarAlt, FaLink,
 } from "react-icons/fa";
 import { userApi, type MyDailySubmission } from "../../services";
+import { useNotifications } from "../../context/NotificationContext";
+import { useAuth } from "../../context/AuthContext";
 import Pagination from "../../components/shared/Pagination";
 import DateRangePicker from "../../components/shared/DateRangePicker";
 import Swal from "sweetalert2";
@@ -29,6 +31,8 @@ const fmtDate = (d: string) => {
 const today = new Date().toISOString().split("T")[0];
 
 export default function UserDailySubmission() {
+    const { addNotification } = useNotifications();
+    const { user } = useAuth();
     const [view, setView] = useState<ViewMode>("list");
     const [submissions, setSubmissions] = useState<MyDailySubmission[]>([]);
     const [loading, setLoading] = useState(true);
@@ -100,6 +104,13 @@ export default function UserDailySubmission() {
             setAccept(""); setReject(""); setFolderLink("");
             setSubmissionDate(today);
 
+            addNotification({
+                panel: "admin",
+                type: "daily_submission",
+                title: "New Daily Submission",
+                message: `${user?.name || "Employee"} submitted daily work: ${topic.trim()}`,
+                link: "/dashboard/daily-submissions",
+            });
             Swal.fire({
                 icon: "success",
                 title: "Submitted!",
@@ -138,8 +149,8 @@ export default function UserDailySubmission() {
                     <button
                         onClick={() => setView("list")}
                         className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${view === "list"
-                                ? "bg-gradient-to-r from-[#45CFFF] to-[#1E56E0] text-white shadow-lg"
-                                : "bg-white dark:bg-[#0F1E3D] border border-[#E2E8F0] dark:border-[#2D3748] text-[#596887] dark:text-[#B9C7E0]"
+                            ? "bg-gradient-to-r from-[#45CFFF] to-[#1E56E0] text-white shadow-lg"
+                            : "bg-white dark:bg-[#0F1E3D] border border-[#E2E8F0] dark:border-[#2D3748] text-[#596887] dark:text-[#B9C7E0]"
                             }`}
                     >
                         <FaList size={12} className="inline mr-2" />
@@ -148,8 +159,8 @@ export default function UserDailySubmission() {
                     <button
                         onClick={() => setView("submit")}
                         className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${view === "submit"
-                                ? "bg-gradient-to-r from-[#45CFFF] to-[#1E56E0] text-white shadow-lg"
-                                : "bg-white dark:bg-[#0F1E3D] border border-[#E2E8F0] dark:border-[#2D3748] text-[#596887] dark:text-[#B9C7E0]"
+                            ? "bg-gradient-to-r from-[#45CFFF] to-[#1E56E0] text-white shadow-lg"
+                            : "bg-white dark:bg-[#0F1E3D] border border-[#E2E8F0] dark:border-[#2D3748] text-[#596887] dark:text-[#B9C7E0]"
                             }`}
                     >
                         <FaPlus size={12} className="inline mr-2" />
@@ -170,8 +181,8 @@ export default function UserDailySubmission() {
                                 key={f}
                                 onClick={() => setFilter(f)}
                                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${filter === f
-                                        ? "bg-[#45CFFF] text-white shadow-md"
-                                        : "bg-white dark:bg-[#0F1E3D] border border-[#E2E8F0] dark:border-[#2D3748] text-[#718096] dark:text-[#A0AEC0]"
+                                    ? "bg-[#45CFFF] text-white shadow-md"
+                                    : "bg-white dark:bg-[#0F1E3D] border border-[#E2E8F0] dark:border-[#2D3748] text-[#718096] dark:text-[#A0AEC0]"
                                     }`}
                             >
                                 {f}
@@ -193,10 +204,10 @@ export default function UserDailySubmission() {
                                 <div className="flex items-start gap-4">
                                     <div
                                         className={`w-11 h-11 rounded-xl flex items-center justify-center text-white shadow-lg flex-shrink-0 ${s.status === "Approved"
-                                                ? "bg-gradient-to-br from-[#10B981] to-[#059669]"
-                                                : s.status === "Pending"
-                                                    ? "bg-gradient-to-br from-[#F59E0B] to-[#D97706]"
-                                                    : "bg-gradient-to-br from-[#EF4444] to-[#DC2626]"
+                                            ? "bg-gradient-to-br from-[#10B981] to-[#059669]"
+                                            : s.status === "Pending"
+                                                ? "bg-gradient-to-br from-[#F59E0B] to-[#D97706]"
+                                                : "bg-gradient-to-br from-[#EF4444] to-[#DC2626]"
                                             }`}
                                     >
                                         {s.status === "Approved" ? (

@@ -31,7 +31,7 @@ interface ServiceNode {
 const NODES: ServiceNode[] = [
     { id: "hosting", title: "Domain & Hosting", meta: "UPTIME · SETUP", posClassName: "top-[2%] left-[6%]" },
     { id: "webdev", title: "Web Development", meta: "SITES · APPS", posClassName: "top-[8%] right-0" },
-    { id: "design", title: "Graphic Design", meta: "T-SHIRTS · FLYERS · BROCHURES", posClassName: "bottom-[6%] left-0" },
+    { id: "design", title: "Graphic Design", meta: "T-SHIRTS · FLYERS ", posClassName: "bottom-[6%] left-0" },
     { id: "marketing", title: "Digital Marketing", meta: "FB & IG GROWTH", posClassName: "bottom-0 right-[8%]" },
 ];
 
@@ -203,8 +203,8 @@ export default function EntraHero() {
                 <div className="mx-auto flex w-full max-w-7xl flex-1 items-center py-10">
                     <div className="grid w-full grid-cols-1 items-center gap-8 md:grid-cols-[1.05fr_0.95fr]">
                         {/* COPY */}
-                        <div>
-                            <div className="mb-5 flex items-center gap-3 font-mono text-[12.5px] uppercase tracking-[0.22em] text-[#45CFFF]">
+                        <div className="pl-4 md:pl-0">
+                            <div className="mb-5 flex items-center  gap-3 font-mono text-[12.5px] uppercase tracking-[0.22em] text-[#45CFFF]">
                                 <span className="inline-block h-px w-7 bg-[#45CFFF]" />
                                 Innovate · Connect · Empower
                             </div>
